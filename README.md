@@ -3,7 +3,7 @@
 > Binary classification of cardiovascular disease risk using CDC BRFSS 2020 survey data.  
 > **Hochschule Pforzheim · BIS3012 · Prof. Dr. Dustin van der Haar · 2026**
 
-🌐 **Live website:** [saffadek.github.io/heart-disease-classification](https://saffadek.github.io/heart-disease-classification)
+🌐 **Live website:** [saffadek.github.io/heart-disease-classification]([https://saffadek.github.io/heart-disease-classification](https://saffadek.github.io/heart-disease-classification))
 
 ---
 
