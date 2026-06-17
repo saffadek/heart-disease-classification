@@ -2,388 +2,391 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>CardioML — Heart Disease Classification</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}html{scroll-behavior:smooth}
-:root{--navy:#0a1628;--navy2:#112240;--teal:#06b6d4;--teal2:#0891b2;--red:#ef4444;--red2:#dc2626;--green:#22c55e;--green2:#16a34a;--amber:#f59e0b;--purple:#8b5cf6;--gray50:#f8fafc;--gray100:#f1f5f9;--gray200:#e2e8f0;--gray300:#cbd5e1;--gray400:#94a3b8;--gray500:#64748b;--gray600:#475569;--gray700:#334155;--gray800:#1e293b;--gray900:#0f172a;--white:#ffffff;--font:"Inter",sans-serif;--mono:"JetBrains Mono",monospace;--radius:12px;--shadow:0 4px 24px rgba(0,0,0,.08);--shadow-lg:0 8px 40px rgba(0,0,0,.12)}
-body{font-family:var(--font);background:var(--gray50);color:var(--gray800);font-size:15px;line-height:1.6;overflow-x:hidden}
-::-webkit-scrollbar{width:6px}::-webkit-scrollbar-thumb{background:var(--gray300);border-radius:3px}
-nav{position:sticky;top:0;z-index:200;background:rgba(255,255,255,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--gray200);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px}
-.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:18px;color:var(--navy);text-decoration:none;letter-spacing:-.02em}
-.brand-icon{width:32px;height:32px;background:linear-gradient(135deg,var(--red),var(--purple));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px}
+:root{--ink:#0a0f1e;--ink2:#1a2340;--red:#e53935;--red2:#b71c1c;--red3:#ff6b6b;--dim:#64748b;--dim2:#94a3b8;--border:#e2e8f0;--surface:#f8fafc;--white:#fff;--green:#22c55e;--amber:#f59e0b;--font:'Inter',sans-serif;--mono:'JetBrains Mono',monospace}
+body{font-family:var(--font);background:var(--white);color:var(--ink);font-size:15px;line-height:1.65;overflow-x:hidden}
+::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#cbd5e1;border-radius:2px}
+nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 2.5rem;display:flex;align-items:center;justify-content:space-between;height:60px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:700;font-size:17px;color:var(--ink);text-decoration:none}
+.logo-box{width:28px;height:28px;background:var(--red);border-radius:7px;display:grid;place-items:center}
+.logo-box svg{width:16px;height:16px;fill:white}
 .nav-links{display:flex;gap:2rem;list-style:none}
-.nav-links a{font-size:13px;font-weight:500;color:var(--gray500);text-decoration:none;transition:color .2s}
-.nav-links a:hover{color:var(--navy)}
-.nav-cta{background:var(--navy);color:white;font-size:13px;font-weight:500;padding:8px 16px;border-radius:8px;text-decoration:none}
-.hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 50%,#1a1040 100%);padding:5rem 2rem 4rem;position:relative;overflow:hidden;min-height:520px;display:flex;align-items:center}
-.hero-bg{position:absolute;inset:0;overflow:hidden}
-.hero-orb{position:absolute;border-radius:50%;filter:blur(60px)}
-.orb1{width:400px;height:400px;background:rgba(6,182,212,.12);top:-100px;right:-50px}
-.orb2{width:300px;height:300px;background:rgba(139,92,246,.1);bottom:-50px;left:20%}
-.orb3{width:200px;height:200px;background:rgba(239,68,68,.08);top:30%;right:25%}
-.hero-inner{max-width:960px;margin:0 auto;position:relative;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:center}
-.hero-tag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-family:var(--mono);color:rgba(255,255,255,.4);letter-spacing:.12em;text-transform:uppercase;margin-bottom:1.25rem;background:rgba(255,255,255,.06);padding:6px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.08)}
-.hero-tag span{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blink 2s infinite}
-@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
-h1{font-size:clamp(2rem,4vw,3rem);font-weight:700;color:white;line-height:1.15;letter-spacing:-.03em;margin-bottom:1.25rem}
-h1 .accent{background:linear-gradient(90deg,var(--teal),var(--purple));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
-.hero-sub{font-size:.95rem;color:rgba(255,255,255,.55);line-height:1.8;margin-bottom:2rem}
-.hero-btns{display:flex;gap:12px;flex-wrap:wrap}
-.btn-primary{background:linear-gradient(135deg,var(--teal),var(--purple));color:white;font-weight:600;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none;border:none;cursor:pointer;transition:opacity .2s,transform .2s;display:inline-flex;align-items:center;gap:8px}
-.btn-primary:hover{opacity:.9;transform:translateY(-1px)}
-.btn-ghost{background:rgba(255,255,255,.08);color:rgba(255,255,255,.75);font-weight:500;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none;border:1px solid rgba(255,255,255,.12);cursor:pointer;transition:background .2s;display:inline-flex;align-items:center;gap:8px}
-.btn-ghost:hover{background:rgba(255,255,255,.14)}
-.hero-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:16px;padding:1.5rem;backdrop-filter:blur(8px)}
-.hero-stats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.08);border-radius:10px;overflow:hidden;margin-bottom:1rem}
-.hstat{background:rgba(255,255,255,.04);padding:1rem;text-align:center}
-.hstat .n{font-family:var(--mono);font-size:1.6rem;font-weight:500;color:white;display:block;line-height:1}
-.hstat .l{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.08em;margin-top:5px;display:block}
-.model-pills{display:flex;gap:6px;flex-wrap:wrap}
-.mpill{font-size:11px;font-family:var(--mono);padding:4px 10px;border-radius:20px;font-weight:500}
-.mpill.best{background:rgba(6,182,212,.2);color:var(--teal);border:1px solid rgba(6,182,212,.3)}
-.mpill.ok{background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);border:1px solid rgba(255,255,255,.1)}
-section{padding:4rem 2rem}
-.inner{max-width:960px;margin:0 auto}
-.sec-eyebrow{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.14em;color:var(--teal);font-weight:500;margin-bottom:.75rem;display:flex;align-items:center;gap:8px}
-.sec-eyebrow::after{content:"";flex:1;max-width:30px;height:1px;background:var(--teal);opacity:.4}
-h2{font-size:clamp(1.5rem,3vw,2.1rem);font-weight:700;color:var(--navy);margin-bottom:.75rem;letter-spacing:-.02em}
-.sec-lead{color:var(--gray500);max-width:680px;margin-bottom:2.5rem;font-size:.94rem}
+.nav-links a{font-size:13px;font-weight:500;color:var(--dim);text-decoration:none;transition:color .15s}
+.nav-links a:hover{color:var(--ink)}
+.nav-btn{background:var(--red);color:white;font-size:13px;font-weight:600;padding:7px 16px;border-radius:8px;text-decoration:none}
+.hero{min-height:90vh;display:flex;align-items:center;background:var(--ink);overflow:hidden;position:relative;padding:4rem 2.5rem}
+.hgrid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px);background-size:50px 50px}
+.hero-inner{max-width:1100px;margin:0 auto;width:100%;display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;position:relative;z-index:1}
+.htag{display:inline-flex;align-items:center;gap:8px;font-size:11px;font-family:var(--mono);color:rgba(255,255,255,.4);letter-spacing:.15em;text-transform:uppercase;margin-bottom:1.5rem;padding:5px 12px;background:rgba(229,57,53,.12);border:1px solid rgba(229,57,53,.25);border-radius:20px}
+.dot{width:5px;height:5px;border-radius:50%;background:var(--red3);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+h1{font-size:clamp(2.2rem,4.5vw,3.4rem);font-weight:700;color:white;line-height:1.1;letter-spacing:-.04em;margin-bottom:1.25rem}
+h1 .red{color:var(--red3)}
+.hdesc{font-size:.97rem;color:rgba(255,255,255,.5);line-height:1.85;margin-bottom:2rem;max-width:520px}
+.hbtns{display:flex;gap:12px;flex-wrap:wrap}
+.btn-r{background:var(--red);color:white;font-weight:600;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;transition:background .15s}
+.btn-r:hover{background:var(--red2)}
+.btn-g{background:rgba(255,255,255,.07);color:rgba(255,255,255,.7);font-weight:500;font-size:14px;padding:12px 24px;border-radius:10px;text-decoration:none;border:1px solid rgba(255,255,255,.12);display:inline-flex;align-items:center;gap:8px}
+.btn-g:hover{background:rgba(255,255,255,.12)}
+.hcard{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.5rem;backdrop-filter:blur(8px)}
+.hstats{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.07);border-radius:10px;overflow:hidden;margin-bottom:1.25rem}
+.hs{background:rgba(255,255,255,.03);padding:1.25rem 1rem;text-align:center}
+.hs .n{font-family:var(--mono);font-size:1.9rem;font-weight:600;color:white;display:block;line-height:1;margin-bottom:5px}
+.hs .n.r{color:var(--red3)}
+.hs .l{font-size:11px;color:rgba(255,255,255,.3);text-transform:uppercase;letter-spacing:.08em;display:block}
+.hs .s{font-size:10px;color:rgba(255,255,255,.18);margin-top:3px;display:block;font-family:var(--mono)}
+.hwhy{padding:1.1rem;background:rgba(229,57,53,.08);border:1px solid rgba(229,57,53,.18);border-radius:10px}
+.hwhy-t{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:rgba(229,82,82,.6);margin-bottom:.65rem}
+.hwhy-i{font-size:13px;color:rgba(255,255,255,.5);padding:3px 0;display:flex;align-items:flex-start;gap:8px;line-height:1.5}
+.hwhy-i::before{content:"→";color:var(--red3);flex-shrink:0;font-family:var(--mono);font-size:11px;margin-top:2px}
+section{padding:5rem 2.5rem;border-bottom:1px solid var(--border)}
+section:last-of-type{border-bottom:none}
+.sec{max-width:1100px;margin:0 auto}
+.stag{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.15em;color:var(--red);font-weight:500;margin-bottom:.65rem}
+h2{font-size:clamp(1.6rem,3vw,2.3rem);font-weight:700;color:var(--ink);margin-bottom:.75rem;letter-spacing:-.03em;line-height:1.2}
+.slead{color:var(--dim);max-width:700px;margin-bottom:2.5rem;font-size:.95rem;line-height:1.8}
 .scards{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1rem;margin-bottom:2rem}
-.scard{background:white;border:1px solid var(--gray200);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow)}
+.scard{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
 .scard .ic{font-size:1.5rem;margin-bottom:.75rem}
-.scard .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--gray400);font-family:var(--mono);margin-bottom:.4rem}
-.scard .val{font-family:var(--mono);font-size:1.8rem;font-weight:500;color:var(--navy);line-height:1}
-.scard .sub{font-size:12px;color:var(--gray400);margin-top:4px}
-.chart-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
-@media(max-width:640px){.chart-row{grid-template-columns:1fr}}
-.ccrd{background:white;border:1px solid var(--gray200);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow)}
-.ctitle{font-size:13px;font-weight:600;color:var(--navy);margin-bottom:.2rem}
-.csub{font-size:12px;color:var(--gray400);margin-bottom:1rem}
-.legend{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap}
-.li{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--gray500)}
+.scard .lb{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim2);font-family:var(--mono);margin-bottom:.4rem}
+.scard .vl{font-family:var(--mono);font-size:1.9rem;font-weight:600;color:var(--ink);line-height:1}
+.scard .vl.r{color:var(--red)}
+.scard .sb{font-size:12px;color:var(--dim2);margin-top:4px}
+.cr{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem}
+@media(max-width:700px){.cr,.hero-inner,.cg,.mg,.eg,.tg{grid-template-columns:1fr!important}}
+.cc{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.4rem}
+.ct{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:.2rem}
+.cs{font-size:12px;color:var(--dim2);margin-bottom:1rem}
+.leg{display:flex;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.li{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--dim)}
 .lsq{width:10px;height:10px;border-radius:2px;flex-shrink:0}
-.pipeline{display:grid;grid-template-columns:repeat(6,1fr);gap:0;background:white;border:1px solid var(--gray200);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);margin-bottom:2rem}
-.ps{padding:1rem .75rem;text-align:center;border-right:1px solid var(--gray100)}
-.ps:last-child{border-right:none}
-.ps:hover{background:var(--gray50)}
-.ps-num{font-family:var(--mono);font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:var(--gray400);display:block;margin-bottom:6px}
-.ps-icon{font-size:1.25rem;display:block;margin-bottom:6px}
-.ps-name{font-size:12px;font-weight:600;color:var(--navy);display:block;margin-bottom:3px}
-.ps-detail{font-size:10px;color:var(--gray400);line-height:1.4}
-.model-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
-@media(max-width:640px){.model-grid{grid-template-columns:1fr}}
-.mcrd{background:white;border:2px solid var(--gray200);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);transition:transform .2s,box-shadow .2s}
-.mcrd:hover{transform:translateY(-2px);box-shadow:var(--shadow-lg)}
-.mcrd.best{border-color:var(--teal)}
-.mhdr{padding:1rem 1.1rem;border-bottom:1px solid var(--gray100);display:flex;justify-content:space-between;align-items:flex-start}
-.mname{font-size:13px;font-weight:600;color:var(--navy)}
-.mrole{font-size:11px;color:var(--gray400);margin-top:2px}
-.mbadge{font-size:10px;font-family:var(--mono);background:var(--teal);color:white;padding:3px 8px;border-radius:20px;font-weight:500}
-.mmetrics{padding:1rem 1.1rem}
-.mrow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--gray50);font-size:12px}
-.mrow:last-of-type{border-bottom:none}
-.mlbl{color:var(--gray500)}
-.mval{font-family:var(--mono);font-weight:500;color:var(--navy)}
-.mval.hi{color:var(--teal)}
-.mbar{height:3px;background:var(--gray100);border-radius:2px;margin-top:10px;overflow:hidden}
-.mbfill{height:100%;border-radius:2px;background:linear-gradient(90deg,var(--teal),var(--purple))}
-.cm-wrap{background:white;border:1px solid var(--gray200);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow);display:inline-block}
-.cm{display:inline-grid;grid-template-columns:80px 1fr 1fr;grid-template-rows:auto 1fr 1fr;gap:3px}
-.cmh{font-size:11px;color:var(--gray400);font-family:var(--mono);text-align:center;padding:6px;display:flex;align-items:center;justify-content:center;font-weight:500}
-.cmrl{font-size:11px;color:var(--gray400);font-family:var(--mono);text-align:right;padding:6px 10px;display:flex;align-items:center;justify-content:flex-end;font-weight:500}
-.cmcell{padding:1rem;text-align:center;border-radius:8px;min-width:95px}
-.cmcell .cn{font-family:var(--mono);font-size:2rem;font-weight:700;display:block;line-height:1}
-.cmcell .cl{font-size:10px;margin-top:5px;display:block;line-height:1.4;font-weight:500}
+.call{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--red);border-radius:0 10px 10px 0;padding:1rem 1.25rem;margin:1.5rem 0;font-size:13px;color:var(--dim)}
+.call strong{color:var(--ink)}
+.call.ok{border-left-color:var(--green)}
+.call.am{border-left-color:var(--amber)}
+/* EXPLAINER CARDS */
+.explain-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:2rem}
+@media(max-width:700px){.explain-grid{grid-template-columns:1fr}}
+.exp-card{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.25rem;position:relative;overflow:hidden}
+.exp-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--red)}
+.exp-num{font-family:var(--mono);font-size:2rem;font-weight:700;color:var(--border);line-height:1;margin-bottom:.5rem}
+.exp-title{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:.5rem}
+.exp-desc{font-size:13px;color:var(--dim);line-height:1.65}
+.exp-stat{font-family:var(--mono);font-size:11px;color:var(--red);margin-top:.75rem;padding-top:.75rem;border-top:1px solid var(--border)}
+/* FEATURE BARS */
+.feat-list{display:flex;flex-direction:column;gap:.75rem;margin-bottom:2rem}
+.feat-row{display:grid;grid-template-columns:140px 1fr 60px;align-items:center;gap:12px;padding:.85rem 1rem;background:var(--white);border:1px solid var(--border);border-radius:10px;cursor:pointer;transition:all .2s}
+.feat-row:hover,.feat-row.active{border-color:var(--red);background:#fff5f5}
+.feat-name{font-size:13px;font-weight:500;color:var(--ink)}
+.feat-sub{font-size:11px;color:var(--dim2);margin-top:2px}
+.feat-bar-wrap{height:8px;background:var(--border);border-radius:4px;overflow:hidden}
+.feat-bar-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,var(--red2),var(--red3));transition:width .7s ease}
+.feat-pct{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--red);text-align:right}
+.feat-detail{background:linear-gradient(135deg,var(--ink) 0%,var(--ink2) 100%);border-radius:14px;padding:2rem;color:white;transition:all .4s}
+.fd-tag{font-size:10px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.3);margin-bottom:.75rem}
+.fd-num{font-family:var(--mono);font-size:3rem;font-weight:700;color:var(--red3);line-height:1;margin-bottom:.25rem}
+.fd-label{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:1rem;font-family:var(--mono)}
+.fd-title{font-size:18px;font-weight:600;color:white;margin-bottom:.6rem}
+.fd-desc{font-size:13px;color:rgba(255,255,255,.5);line-height:1.75;margin-bottom:1.25rem}
+.fd-vs{display:grid;grid-template-columns:1fr 1fr;gap:.75rem}
+.fdv{background:rgba(255,255,255,.06);border-radius:8px;padding:.9rem;text-align:center}
+.fdv .n{font-family:var(--mono);font-size:1.6rem;font-weight:600;display:block;line-height:1;margin-bottom:4px}
+.fdv .l{font-size:11px;color:rgba(255,255,255,.3)}
+.fdv.hi .n{color:var(--red3)}
+.fdv.lo .n{color:#4ade80}
+/* MODELS */
+.model-switcher{display:flex;gap:6px;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:5px;margin-bottom:1.5rem;width:fit-content}
+.msw-btn{padding:8px 18px;border-radius:7px;font-size:13px;font-weight:500;cursor:pointer;color:var(--dim);background:none;border:none;font-family:var(--font);transition:all .2s}
+.msw-btn.active{background:var(--white);color:var(--ink);box-shadow:0 1px 4px rgba(0,0,0,.08);font-weight:600}
+.mg{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1.5rem}
+.mc{background:var(--white);border:2px solid var(--border);border-radius:12px;overflow:hidden;transition:transform .2s,box-shadow .2s;cursor:pointer}
+.mc:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.08)}
+.mc.active{border-color:var(--red)}
+.mc.winner{border-color:var(--red)}
+.mh{padding:1rem 1.15rem;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:flex-start}
+.mn{font-size:14px;font-weight:600;color:var(--ink)}
+.mr{font-size:11px;color:var(--dim2);margin-top:3px}
+.mbadge{font-size:10px;font-family:var(--mono);background:var(--red);color:white;padding:3px 8px;border-radius:20px}
+.mb{padding:1rem 1.15rem}
+.mmet{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid #f8fafc;font-size:12px}
+.mmet:last-of-type{border-bottom:none}
+.mml{color:var(--dim)}
+.mmv{font-family:var(--mono);font-weight:500;color:var(--ink)}
+.mmv.hi{color:var(--red)}
+.mmv.wa{color:var(--amber)}
+.prog{height:3px;background:var(--border);border-radius:2px;margin-top:10px;overflow:hidden}
+.pf{height:100%;border-radius:2px;transition:width .6s ease}
+/* MODEL DETAIL */
+.model-detail{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:2rem;margin-bottom:1.5rem;display:none}
+.model-detail.show{display:block}
+.md-head{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:1.5rem}
+.md-title{font-size:20px;font-weight:700;color:var(--ink)}
+.md-sub{font-size:13px;color:var(--dim);margin-top:4px}
+.md-body{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+@media(max-width:700px){.md-body{grid-template-columns:1fr}}
+.md-explain{font-size:13px;color:var(--dim);line-height:1.75}
+.md-explain h4{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:.4rem}
+.md-explain p{margin-bottom:.75rem}
+.md-explain .analogy{background:var(--ink);color:rgba(255,255,255,.75);border-radius:10px;padding:1rem;font-size:13px;line-height:1.65;margin:.75rem 0}
+.md-explain .analogy strong{color:white}
+.md-metrics{display:flex;flex-direction:column;gap:.6rem}
+.metric-big{background:var(--white);border:1px solid var(--border);border-radius:10px;padding:1rem}
+.mb-n{font-family:var(--mono);font-size:2rem;font-weight:700;line-height:1;margin-bottom:4px}
+.mb-l{font-size:12px;color:var(--dim)}
+.mb-bar{height:5px;background:var(--border);border-radius:3px;margin-top:.6rem;overflow:hidden}
+.mb-fill{height:100%;border-radius:3px;transition:width .8s}
+/* CONFUSION MATRIX */
+.cm{display:inline-grid;grid-template-columns:72px 1fr 1fr;grid-template-rows:auto 1fr 1fr;gap:3px}
+.cmh{font-size:10px;color:var(--dim2);font-family:var(--mono);text-align:center;padding:5px;display:flex;align-items:center;justify-content:center;font-weight:500}
+.cmrl{font-size:10px;color:var(--dim2);font-family:var(--mono);padding:5px 8px;display:flex;align-items:center;justify-content:flex-end;text-align:right}
+.cmc{padding:.85rem;text-align:center;border-radius:8px;min-width:88px}
+.cmc .cn{font-family:var(--mono);font-size:1.8rem;font-weight:700;display:block;line-height:1}
+.cmc .cl{font-size:10px;margin-top:5px;display:block;line-height:1.4;font-weight:500}
 .tn{background:#f0fdf4}.tn .cn{color:#16a34a}.tn .cl{color:#166534}
-.fp{background:#fefce8}.fp .cn{color:#f59e0b}.fp .cl{color:#92400e}
-.fn{background:#fef2f2}.fn .cn{color:#dc2626}.fn .cl{color:#991b1b}
+.fp{background:#fef9c3}.fp .cn{color:#ca8a04}.fp .cl{color:#854d0e}
+.fn{background:#fee2e2}.fn .cn{color:#dc2626}.fn .cl{color:#991b1b}
 .tp{background:#f0fdf4}.tp .cn{color:#16a34a}.tp .cl{color:#166534}
-.fbars{display:grid;grid-template-columns:1fr 1fr;gap:2rem;margin-bottom:2rem}
-@media(max-width:640px){.fbars{grid-template-columns:1fr}}
-.fitem{padding:10px 0;border-bottom:1px solid var(--gray100)}
-.fitem:last-child{border-bottom:none}
-.ftop{display:flex;align-items:center;gap:10px}
-.frank{font-family:var(--mono);font-size:11px;color:var(--gray400);width:20px;flex-shrink:0}
-.fname{font-family:var(--mono);font-size:12px;color:var(--navy);font-weight:600;min-width:88px}
-.fbarw{flex:1;height:5px;background:var(--gray100);border-radius:3px;overflow:hidden}
-.fbarfill{height:100%;border-radius:3px}
-.fpct{font-family:var(--mono);font-size:11px;color:var(--gray500);min-width:36px;text-align:right}
-.fdesc{font-size:11px;color:var(--gray400);line-height:1.5;margin-top:4px;padding-left:30px}
-.callout{background:white;border:1px solid var(--gray200);border-left:3px solid var(--teal);border-radius:0 var(--radius) var(--radius) 0;padding:1rem 1.25rem;margin:1.5rem 0;font-size:13px;color:var(--gray600);box-shadow:var(--shadow)}
-.callout.warn{border-left-color:var(--amber)}
-.callout.danger{border-left-color:var(--red)}
-.callout.success{border-left-color:var(--green)}
-.callout strong{color:var(--navy)}
-#calculator{background:var(--navy);padding:5rem 2rem}
-#calculator h2{color:white}
-#calculator .sec-lead{color:rgba(255,255,255,.5)}
-.calc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
-@media(max-width:640px){.calc-grid{grid-template-columns:1fr}}
-.calc-card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:1.5rem}
-.calc-section-title{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.4);margin-bottom:1rem;font-weight:500}
-.form-group{margin-bottom:1rem}
-.form-label{font-size:12px;font-weight:500;color:rgba(255,255,255,.6);display:block;margin-bottom:6px}
-.form-control{width:100%;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);border-radius:8px;padding:10px 12px;color:white;font-size:13px;font-family:var(--font);outline:none;transition:border-color .2s;appearance:none}
-.form-control:focus{border-color:var(--teal)}
-.form-control option{background:#112240;color:white}
-.form-range{width:100%;accent-color:var(--teal);cursor:pointer;margin:4px 0}
-.range-labels{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.3);font-family:var(--mono);margin-top:2px}
-.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.06)}
-.toggle-row:last-child{border-bottom:none}
-.toggle-label{font-size:13px;color:rgba(255,255,255,.65)}
-.toggle{position:relative;display:inline-block;width:40px;height:22px;flex-shrink:0}
-.toggle input{opacity:0;width:0;height:0}
-.toggle-slider{position:absolute;inset:0;background:rgba(255,255,255,.15);border-radius:11px;cursor:pointer;transition:.3s}
-.toggle-slider::before{content:"";position:absolute;width:16px;height:16px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.3s}
-input:checked+.toggle-slider{background:var(--teal)}
-input:checked+.toggle-slider::before{transform:translateX(18px)}
-.calc-result{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:var(--radius);padding:1.5rem;text-align:center;margin-top:1.5rem}
-.result-label{font-size:12px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.4);margin-bottom:.75rem}
-.result-gauge{position:relative;width:140px;height:140px;margin:0 auto 1rem}
-.gauge-svg{width:140px;height:140px;transform:rotate(-90deg)}
-.gauge-bg{fill:none;stroke:rgba(255,255,255,.1);stroke-width:12}
-.gauge-fill{fill:none;stroke-width:12;stroke-linecap:round;transition:stroke-dashoffset .8s ease,stroke .4s}
-.result-pct{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-.result-num{font-family:var(--mono);font-size:2rem;font-weight:700;color:white;line-height:1}
-.result-unit{font-size:11px;color:rgba(255,255,255,.4)}
-.result-risk{font-size:14px;font-weight:600;margin-bottom:.5rem}
-.result-msg{font-size:12px;color:rgba(255,255,255,.45);line-height:1.6}
-.calc-btn{width:100%;background:linear-gradient(135deg,var(--teal),var(--purple));color:white;font-size:14px;font-weight:600;padding:14px;border:none;border-radius:10px;cursor:pointer;margin-top:1rem;transition:opacity .2s,transform .2s;font-family:var(--font)}
-.calc-btn:hover{opacity:.9;transform:translateY(-1px)}
-.disclaimer{font-size:11px;color:rgba(255,255,255,.25);text-align:center;margin-top:1rem;line-height:1.6}
-.tscroll{overflow-x:auto;margin-bottom:1.5rem;border-radius:var(--radius);box-shadow:var(--shadow)}
-table{width:100%;border-collapse:collapse;font-size:13px;background:white}
-th{background:var(--navy);color:white;padding:10px 14px;text-align:left;font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;font-family:var(--mono)}
-td{padding:10px 14px;border-bottom:1px solid var(--gray100);color:var(--gray700);vertical-align:middle}
-tr:last-child td{border-bottom:none}
-tr:hover td{background:var(--gray50)}
-.tmono{font-family:var(--mono);color:var(--teal2);font-weight:500}
-.tbadge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:10px;font-family:var(--mono);font-weight:500}
-.cont{background:#e0f2fe;color:#075985}.cat{background:#fce7f3;color:#9d174d}.bin{background:#f0fdf4;color:#166534}.ord{background:#fef3c7;color:#92400e}.tgt{background:var(--navy);color:white}
-.ethics-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
-@media(max-width:640px){.ethics-grid{grid-template-columns:1fr}}
-.ecrd{background:white;border:1px solid var(--gray200);border-radius:var(--radius);padding:1.25rem;box-shadow:var(--shadow);transition:transform .2s}
-.ecrd:hover{transform:translateY(-2px)}
-.eicon{font-size:1.5rem;margin-bottom:.75rem;display:block}
-.etitle{font-size:14px;font-weight:600;color:var(--navy);margin-bottom:6px}
-.ebody{font-size:13px;color:var(--gray500);line-height:1.65}
-.tgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
-@media(max-width:640px){.tgrid{grid-template-columns:1fr 1fr}}
-.tcrd{background:white;border:1px solid var(--gray200);border-radius:var(--radius);padding:1.5rem 1rem;text-align:center;box-shadow:var(--shadow)}
-.tavatar{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;margin:0 auto 12px;color:white}
-.tname{font-size:14px;font-weight:600;color:var(--navy)}
-.trole{font-size:12px;color:var(--gray400);margin-top:4px}
-footer{background:var(--gray900);color:rgba(255,255,255,.4);padding:3rem 2rem;text-align:center;font-size:13px;line-height:2}
-footer strong{color:rgba(255,255,255,.7)}footer a{color:rgba(255,255,255,.5);text-decoration:none}footer a:hover{color:white}
-.fade-in{opacity:0;transform:translateY(20px);transition:opacity .6s,transform .6s}
-.fade-in.visible{opacity:1;transform:translateY(0)}
-.bg-white{background:white}.bg-gray{background:var(--gray50)}
-.divider{height:1px;background:linear-gradient(90deg,transparent,var(--gray200),transparent);margin:0 2rem}
+/* CALCULATOR */
+.calc-sec{background:var(--ink);padding:5rem 2.5rem}
+.calc-sec h2{color:white}
+.calc-sec .slead{color:rgba(255,255,255,.45)}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:2rem}
+.cpanel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.75rem}
+.cptitle{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.12em;color:rgba(255,255,255,.3);margin-bottom:1.25rem;display:flex;align-items:center;gap:8px}
+.cptitle::after{content:"";flex:1;height:1px;background:rgba(255,255,255,.07)}
+.fg{margin-bottom:1.1rem}
+.fl{font-size:12px;font-weight:500;color:rgba(255,255,255,.55);display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.fl span{color:var(--red3);font-family:var(--mono);font-size:12px}
+select,input[type=range]{width:100%;font-family:var(--font)}
+select{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:9px 12px;color:white;font-size:13px;outline:none;cursor:pointer;appearance:none}
+select:focus{border-color:rgba(229,57,53,.5)}
+select option{background:#1a2340;color:white}
+input[type=range]{accent-color:var(--red);cursor:pointer;margin:4px 0}
+.rl{display:flex;justify-content:space-between;font-size:10px;color:rgba(255,255,255,.2);font-family:var(--mono);margin-top:2px}
+.tr{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+.tr:last-child{border-bottom:none}
+.tlab{font-size:13px;color:rgba(255,255,255,.6)}
+.tlab small{display:block;font-size:11px;color:rgba(255,255,255,.28);margin-top:1px;font-family:var(--mono)}
+.tog{position:relative;display:inline-block;width:38px;height:20px;flex-shrink:0}
+.tog input{opacity:0;width:0;height:0}
+.ts{position:absolute;inset:0;background:rgba(255,255,255,.12);border-radius:10px;cursor:pointer;transition:.25s}
+.ts::before{content:"";position:absolute;width:14px;height:14px;left:3px;bottom:3px;background:white;border-radius:50%;transition:.25s}
+input:checked+.ts{background:var(--red)}
+input:checked+.ts::before{transform:translateX(18px)}
+.rpanel{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:1.75rem}
+.gw{position:relative;width:160px;height:160px;margin:0 auto 1.25rem}
+.gsvg{width:160px;height:160px;transform:rotate(-90deg)}
+.gbg{fill:none;stroke:rgba(255,255,255,.07);stroke-width:14}
+.gfg{fill:none;stroke-width:14;stroke-linecap:round;transition:stroke-dashoffset .9s cubic-bezier(.4,0,.2,1),stroke .4s}
+.gc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.gpct{font-family:var(--mono);font-size:2.2rem;font-weight:700;color:white;line-height:1}
+.gunit{font-size:11px;color:rgba(255,255,255,.3);margin-top:3px}
+.rlev{text-align:center;margin-bottom:1.25rem}
+.rlabel{font-size:16px;font-weight:600;margin-bottom:.4rem}
+.rdesc{font-size:13px;color:rgba(255,255,255,.4);line-height:1.6}
+.wif{margin-top:1.25rem}
+.wit{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:.75rem}
+.wrow{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.wlbl{font-size:12px;color:rgba(255,255,255,.5);min-width:110px;flex-shrink:0}
+.wbar{flex:1;height:4px;background:rgba(255,255,255,.07);border-radius:2px;position:relative;overflow:hidden}
+.wnow{height:100%;position:absolute;top:0;left:0;background:rgba(229,57,53,.4);border-radius:2px;transition:width .6s}
+.wnew{height:100%;position:absolute;top:0;left:0;border-radius:2px;transition:width .6s}
+.wdif{font-family:var(--mono);font-size:11px;min-width:44px;text-align:right}
+.fbd{margin-top:1.25rem}
+.fbd-t{font-size:11px;font-family:var(--mono);text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-bottom:.75rem}
+/* METHOD STEPS */
+.msteps{display:grid;grid-template-columns:repeat(6,1fr);background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:2rem}
+.ms{padding:1.25rem .9rem;text-align:center;border-right:1px solid var(--border)}
+.ms:last-child{border-right:none}
+.ms:hover{background:var(--white)}
+.msn{font-family:var(--mono);font-size:10px;color:var(--dim2);text-transform:uppercase;letter-spacing:.08em;display:block;margin-bottom:8px}
+.msi{font-size:1.3rem;display:block;margin-bottom:6px}
+.msname{font-size:12px;font-weight:600;color:var(--ink);display:block;margin-bottom:3px}
+.msd{font-size:10px;color:var(--dim2);line-height:1.4}
+.eg{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.ec{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.25rem}
+.ei{font-size:1.4rem;margin-bottom:.75rem;display:block}
+.et{font-size:14px;font-weight:600;color:var(--ink);margin-bottom:.5rem}
+.eb{font-size:13px;color:var(--dim);line-height:1.7}
+.tg{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem}
+.tcard{background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.5rem 1rem;text-align:center}
+.tav{width:50px;height:50px;border-radius:50%;display:grid;place-items:center;font-size:17px;font-weight:700;margin:0 auto 12px;color:white}
+.tname{font-size:14px;font-weight:600;color:var(--ink)}
+.trole{font-size:12px;color:var(--dim2);margin-top:4px}
+footer{background:var(--ink);color:rgba(255,255,255,.35);padding:3rem 2.5rem;text-align:center;font-size:13px;line-height:2}
+footer strong{color:rgba(255,255,255,.65)}
+footer a{color:rgba(255,255,255,.45);text-decoration:none}
+footer a:hover{color:white}
+.divider{height:1px;background:var(--border)}
+.fade{opacity:0;transform:translateY(14px);transition:opacity .5s,transform .5s}
+.fade.in{opacity:1;transform:none}
 </style>
 </head>
 <body>
+
 <nav>
-  <a class="brand" href="#"><div class="brand-icon">&#10084;</div>CardioML</a>
+  <a class="logo" href="#">
+    <div class="logo-box"><svg viewBox="0 0 24 24"><path d="M12 21.593c-5.63-5.539-11-10.297-11-14.402 0-3.791 3.068-5.191 5.281-5.191 1.312 0 4.151.501 5.719 4.457 1.59-3.968 4.464-4.447 5.726-4.447 2.54 0 5.274 1.621 5.274 5.181 0 4.069-5.136 8.625-11 14.402z"/></svg></div>
+    CardioML
+  </a>
   <ul class="nav-links">
-    <li><a href="#overview">Overview</a></li>
-    <li><a href="#dataset">Dataset</a></li>
-    <li><a href="#methodology">Method</a></li>
-    <li><a href="#results">Results</a></li>
+    <li><a href="#why">Why</a></li>
+    <li><a href="#risk-factors">Risk Factors</a></li>
+    <li><a href="#models">Models</a></li>
     <li><a href="#calculator">Risk Tool</a></li>
     <li><a href="#ethics">Ethics</a></li>
   </ul>
-  <a href="#calculator" class="nav-cta">Try Risk Tool &rarr;</a>
+  <a href="#calculator" class="nav-btn">Check My Risk &rarr;</a>
 </nav>
 
+<!-- HERO -->
 <div class="hero">
-  <div class="hero-bg"><div class="hero-orb orb1"></div><div class="hero-orb orb2"></div><div class="hero-orb orb3"></div></div>
+  <div class="hgrid"></div>
   <div class="hero-inner">
     <div>
-      <div class="hero-tag"><span></span> Machine Learning &middot; Binary Classification</div>
-      <h1>Predicting <span class="accent">heart disease</span><br>from lifestyle data</h1>
-      <p class="hero-sub">We sampled 2,059 patients from 319,795 real CDC survey responses &mdash; preserving the true 8.6% disease rate &mdash; and built three ML classifiers with GridSearchCV and <code style="font-family:var(--mono);background:rgba(255,255,255,.1);padding:2px 6px;border-radius:4px;font-size:13px">class_weight=balanced</code>.</p>
-      <div class="hero-btns">
-        <a href="#calculator" class="btn-primary">&#129704; Try Risk Calculator</a>
-        <a href="#results" class="btn-ghost">&#128202; View Results</a>
+      <div class="htag"><span class="dot"></span>BIS3012 &middot; Hochschule Pforzheim &middot; 2026</div>
+      <h1>Can a computer<br>predict a <span class="red">heart attack</span><br>before it happens?</h1>
+      <p class="hdesc">We used real data from 2,059 Americans surveyed by the CDC and trained three different machine learning models to find out &mdash; using only lifestyle questions anyone can answer.</p>
+      <div class="hbtns">
+        <a href="#calculator" class="btn-r">&#129704; Try the Risk Tool</a>
+        <a href="#why" class="btn-g">&#128200; See the Data</a>
       </div>
     </div>
     <div>
-      <div class="hero-card">
-        <div class="hero-stats">
-          <div class="hstat"><span class="n">2,059</span><span class="l">Patients</span></div>
-          <div class="hstat"><span class="n">8.6%</span><span class="l">Real disease rate</span></div>
-          <div class="hstat"><span class="n">82.3%</span><span class="l">Best accuracy</span></div>
-          <div class="hstat"><span class="n">0.855</span><span class="l">AUC-ROC</span></div>
+      <div class="hcard">
+        <div class="hstats">
+          <div class="hs"><span class="n">17.9M</span><span class="l">die every year</span><span class="s">from heart disease — WHO 2023</span></div>
+          <div class="hs"><span class="n r">8.6%</span><span class="l">real disease rate</span><span class="s">in our 2,059-patient sample</span></div>
+          <div class="hs"><span class="n">0.855</span><span class="l">best AUC score</span><span class="s">Random Forest model</span></div>
+          <div class="hs"><span class="n r">80%</span><span class="l">sick patients caught</span><span class="s">Logistic Regression recall</span></div>
         </div>
-        <div style="margin-bottom:.75rem;font-size:11px;color:rgba(255,255,255,.3);font-family:var(--mono);text-transform:uppercase;letter-spacing:.08em">Models trained</div>
-        <div class="model-pills">
-          <span class="mpill ok">Logistic Reg.</span>
-          <span class="mpill best">Random Forest &#9733;</span>
-          <span class="mpill ok">SVM (RBF)</span>
+        <div class="hwhy">
+          <div class="hwhy-t">Why we built this</div>
+          <div class="hwhy-i">Most people only find out they have heart disease after a heart attack — too late for prevention</div>
+          <div class="hwhy-i">The CDC already collects 17 simple lifestyle questions from millions of Americans every year</div>
+          <div class="hwhy-i">We trained ML models to spot high-risk people using only those questions</div>
         </div>
-        <div style="margin-top:.75rem;font-size:11px;color:rgba(255,255,255,.3);font-family:var(--mono)">Source: CDC BRFSS 2020 &middot; Kamilpytlak (2021)</div>
       </div>
     </div>
   </div>
 </div>
 
-<section id="overview" class="bg-white">
-<div class="inner">
-  <div class="sec-eyebrow">Background</div>
-  <h2>Why this matters</h2>
-  <p class="sec-lead">Heart disease kills 17.9 million people per year &mdash; 31% of all global deaths. Most patients are not identified as high risk until after a serious cardiac event. This project asks: can routine self-reported lifestyle data identify high-risk individuals before that happens?</p>
+<!-- WHY -->
+<section id="why">
+<div class="sec">
+  <div class="stag">The Problem &amp; Our Data</div>
+  <h2>Why heart disease? Why the CDC data?</h2>
+  <p class="slead">We didn't pick a random dataset. Heart disease is the world's biggest killer and the CDC survey is the most credible real-world health data available. Here's the full story.</p>
+
   <div class="scards">
-    <div class="scard"><div class="ic">&#127758;</div><div class="lbl">Global deaths/year</div><div class="val">17.9M</div><div class="sub">Cardiovascular disease &mdash; WHO 2023</div></div>
-    <div class="scard"><div class="ic">&#127963;</div><div class="lbl">Data source</div><div class="val">CDC</div><div class="sub">BRFSS 2020 &mdash; 319,795 US responses</div></div>
-    <div class="scard"><div class="ic">&#128101;</div><div class="lbl">Our sample</div><div class="val">2,059</div><div class="sub">At real 8.6% disease rate</div></div>
-    <div class="scard"><div class="ic">&#127919;</div><div class="lbl">Task type</div><div class="val">Binary</div><div class="sub">0 = No disease &middot; 1 = Has disease</div></div>
+    <div class="scard fade"><div class="ic">&#128148;</div><div class="lb">Annual deaths worldwide</div><div class="vl r">17.9M</div><div class="sb">31% of ALL deaths — bigger than cancer, bigger than diabetes</div></div>
+    <div class="scard fade"><div class="ic">&#127963;</div><div class="lb">Our data source</div><div class="vl">CDC</div><div class="sb">US government survey — 319,795 real Americans answered 17 health questions</div></div>
+    <div class="scard fade"><div class="ic">&#128101;</div><div class="lb">Our sample size</div><div class="vl">2,059</div><div class="sb">Patients at the real disease rate of 8.6% — not a fake 50/50 split</div></div>
+    <div class="scard fade"><div class="ic">&#9989;</div><div class="lb">Missing values</div><div class="vl">Zero</div><div class="sb">The CDC data is clean — no imputation needed</div></div>
   </div>
-  <div class="callout success"><strong>What is binary classification?</strong> The model reads 17 numbers about a patient and outputs one answer: does this person have heart disease or not? It learns the pattern from 2,059 labelled examples where the actual diagnosis is already known.</div>
-</div>
-</section>
 
-<div class="divider"></div>
-
-<section id="dataset" class="bg-gray">
-<div class="inner">
-  <div class="sec-eyebrow">Dataset</div>
-  <h2>The patient data</h2>
-  <p class="sec-lead">CDC BRFSS 2020 is the largest US health survey &mdash; 319,795 responses, 17 health features, completely self-reported. We sampled 2,059 patients at the real disease rate. No missing values.</p>
-  <div class="chart-row">
-    <div class="ccrd"><div class="ctitle">Class distribution &mdash; real CDC rate</div><div class="csub">8.6% disease rate reflects true US population prevalence. We kept this real imbalance.</div><div class="legend"><span class="li"><span class="lsq" style="background:#22c55e"></span>No Disease (1,882)</span><span class="li"><span class="lsq" style="background:#ef4444"></span>Heart Disease (177)</span></div><div style="height:200px"><canvas id="distChart"></canvas></div></div>
-    <div class="ccrd"><div class="ctitle">Disease rate by age group</div><div class="csub">Risk rises sharply after 50 &mdash; age is the #1 predictor (28.7% importance)</div><div class="legend"><span class="li"><span class="lsq" style="background:#ef4444"></span>Disease rate (%)</span></div><div style="height:200px"><canvas id="ageChart"></canvas></div></div>
-  </div>
-  <div class="chart-row">
-    <div class="ccrd"><div class="ctitle">General health vs disease rate</div><div class="csub">Poor self-rated health is a powerful composite disease predictor (13.4% importance)</div><div class="legend"><span class="li"><span class="lsq" style="background:#ef4444"></span>Disease rate (%)</span></div><div style="height:200px"><canvas id="ghChart"></canvas></div></div>
-    <div class="ccrd"><div class="ctitle">Disease rate by key risk factors</div><div class="csub">Stroke and diabetes dramatically increase heart disease risk</div><div class="legend"><span class="li"><span class="lsq" style="background:#ef4444"></span>Has disease</span><span class="li"><span class="lsq" style="background:#22c55e"></span>No disease</span></div><div style="height:200px"><canvas id="riskChart"></canvas></div></div>
-  </div>
-  <h3 style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:1rem">All 17 features</h3>
-  <div class="tscroll">
-    <table>
-      <thead><tr><th>Feature</th><th>What it measures</th><th>Type</th><th>Encoding</th></tr></thead>
-      <tbody>
-        <tr><td class="tmono">BMI</td><td>Body mass index</td><td><span class="tbadge cont">Continuous</span></td><td>As-is</td></tr>
-        <tr><td class="tmono">AgeCategory</td><td>Age band: 18&ndash;24 up to 80+</td><td><span class="tbadge ord">Ordinal</span></td><td>0 &rarr; 12</td></tr>
-        <tr><td class="tmono">GenHealth</td><td>Self-reported health: Poor &rarr; Excellent</td><td><span class="tbadge ord">Ordinal</span></td><td>0 &rarr; 4</td></tr>
-        <tr><td class="tmono">Diabetic</td><td>Diabetes status: No / Borderline / Yes</td><td><span class="tbadge ord">Ordinal</span></td><td>0 &rarr; 2</td></tr>
-        <tr><td class="tmono">PhysicalHealth</td><td>Days of poor physical health (last 30)</td><td><span class="tbadge cont">Continuous</span></td><td>As-is</td></tr>
-        <tr><td class="tmono">MentalHealth</td><td>Days of poor mental health (last 30)</td><td><span class="tbadge cont">Continuous</span></td><td>As-is</td></tr>
-        <tr><td class="tmono">SleepTime</td><td>Average hours of sleep per 24 hours</td><td><span class="tbadge cont">Continuous</span></td><td>As-is</td></tr>
-        <tr><td class="tmono">Sex</td><td>Male or Female</td><td><span class="tbadge bin">Binary</span></td><td>0/1</td></tr>
-        <tr><td class="tmono">Smoking</td><td>Smoked &ge; 100 cigarettes lifetime</td><td><span class="tbadge bin">Binary</span></td><td>0/1</td></tr>
-        <tr><td class="tmono">AlcoholDrinking</td><td>Heavy drinker (&gt;14/wk male, &gt;7/wk female)</td><td><span class="tbadge bin">Binary</span></td><td>0/1</td></tr>
-        <tr><td class="tmono">Stroke</td><td>Ever had a stroke</td><td><span class="tbadge bin">Binary</span></td><td>0/1</td></tr>
-        <tr><td class="tmono">DiffWalking</td><td>Difficulty walking or climbing stairs</td><td><span class="tbadge bin">Binary</span></td><td>0/1</td></tr>
-        <tr><td class="tmono">PhysicalActivity</td><td>Exercise in past 30 days outside work</td><td><span class="tbadge bin">Binary</span></td><td>0/1</td></tr>
-        <tr><td class="tmono">Asthma</td><td>Ever had asthma</td><td><span class="tbadge bin">Binary</span></td><td>0/1</td></tr>
-        <tr><td class="tmono">KidneyDisease</td><td>Ever had kidney disease</td><td><span class="tbadge bin">Binary</span></td><td>0/1</td></tr>
-        <tr><td class="tmono">SkinCancer</td><td>Ever had skin cancer</td><td><span class="tbadge bin">Binary</span></td><td>0/1</td></tr>
-        <tr><td class="tmono">Race</td><td>White/Black/Asian/Hispanic/American Indian/Other</td><td><span class="tbadge cat">Nominal</span></td><td>One-hot</td></tr>
-        <tr style="background:#f0f9ff"><td class="tmono"><strong>HeartDisease</strong></td><td><strong>Ever diagnosed with CHD or MI &mdash; TARGET</strong></td><td><span class="tbadge tgt">Target</span></td><td>0/1</td></tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-</section>
-
-<div class="divider"></div>
-
-<section id="methodology" class="bg-white">
-<div class="inner">
-  <div class="sec-eyebrow">Methodology</div>
-  <h2>How we built the models</h2>
-  <p class="sec-lead">A complete ML pipeline &mdash; real CDC data, encoding, scaling, GridSearchCV tuning, and rigorous evaluation on a held-out test set.</p>
-  <div class="pipeline">
-    <div class="ps"><span class="ps-num">01</span><span class="ps-icon">&#128229;</span><span class="ps-name">Sample</span><span class="ps-detail">2,059 at real 8.6% disease rate</span></div>
-    <div class="ps"><span class="ps-num">02</span><span class="ps-icon">&#128269;</span><span class="ps-name">EDA</span><span class="ps-detail">Charts &middot; stats &middot; 0 missing</span></div>
-    <div class="ps"><span class="ps-num">03</span><span class="ps-icon">&#128288;</span><span class="ps-name">Encode</span><span class="ps-detail">Ordinal &middot; binary &middot; one-hot</span></div>
-    <div class="ps"><span class="ps-num">04</span><span class="ps-icon">&#9986;</span><span class="ps-name">Split 80/20</span><span class="ps-detail">1,647 train &middot; 412 test</span></div>
-    <div class="ps"><span class="ps-num">05</span><span class="ps-icon">&#9878;</span><span class="ps-name">Scale</span><span class="ps-detail">StandardScaler (train only)</span></div>
-    <div class="ps"><span class="ps-num">06</span><span class="ps-icon">&#127919;</span><span class="ps-name">GridSearch</span><span class="ps-detail">F1 &middot; 5-fold &middot; balanced</span></div>
-  </div>
-  <div class="callout"><strong>Why class_weight='balanced'?</strong> With 91.4% no disease, a model predicting "no disease" for everyone gets 91.4% accuracy &mdash; while being completely useless. class_weight=balanced forces the algorithm to weight disease patients proportionally higher.</div>
-  <div class="callout warn" style="margin-top:.75rem"><strong>Why keep the imbalance instead of forcing 50/50?</strong> A forced 50/50 split misrepresents reality. Preserving the real 8.6% rate and handling it with class_weight is the academically correct approach for imbalanced medical classification.</div>
-  <div class="callout" style="margin-top:.75rem"><strong>No data leakage:</strong> StandardScaler is fitted on training data ONLY. The same parameters are then applied to the test set. Fitting on all data first produces falsely optimistic results.</div>
-</div>
-</section>
-
-<div class="divider"></div>
-
-<section id="results" class="bg-gray">
-<div class="inner">
-  <div class="sec-eyebrow">Results</div>
-  <h2>Model performance</h2>
-  <p class="sec-lead">All three models classify heart disease above chance. Random Forest achieves the best AUC-ROC (0.855). Logistic Regression achieves the highest disease recall (80%).</p>
-  <div class="model-grid">
-    <div class="mcrd">
-      <div class="mhdr"><div><div class="mname">Logistic Regression</div><div class="mrole">Interpretable baseline &middot; C = 0.01</div></div></div>
-      <div class="mmetrics">
-        <div class="mrow"><span class="mlbl">Test accuracy</span><span class="mval">76.5%</span></div>
-        <div class="mrow"><span class="mlbl">Disease recall &#9733;</span><span class="mval">80.0%</span></div>
-        <div class="mrow"><span class="mlbl">AUC-ROC</span><span class="mval">0.849</span></div>
-        <div class="mrow"><span class="mlbl">CV accuracy</span><span class="mval">77.5% &plusmn;1.3%</span></div>
-        <div class="mbar"><div class="mbfill" style="width:76.5%"></div></div>
-      </div>
-    </div>
-    <div class="mcrd best">
-      <div class="mhdr"><div><div class="mname">Random Forest</div><div class="mrole">depth=5 &middot; n=100 &middot; split=10</div></div><span class="mbadge">Best AUC</span></div>
-      <div class="mmetrics">
-        <div class="mrow"><span class="mlbl">Test accuracy</span><span class="mval hi">82.3%</span></div>
-        <div class="mrow"><span class="mlbl">Disease recall</span><span class="mval hi">74.3%</span></div>
-        <div class="mrow"><span class="mlbl">AUC-ROC</span><span class="mval hi">0.855 &#9733;</span></div>
-        <div class="mrow"><span class="mlbl">CV accuracy</span><span class="mval hi">82.6% &plusmn;1.6%</span></div>
-        <div class="mbar"><div class="mbfill" style="width:82.3%"></div></div>
-      </div>
-    </div>
-    <div class="mcrd">
-      <div class="mhdr"><div><div class="mname">SVM (RBF kernel)</div><div class="mrole">C = 0.1 &middot; &gamma; = 0.001</div></div></div>
-      <div class="mmetrics">
-        <div class="mrow"><span class="mlbl">Test accuracy</span><span class="mval">84.2%</span></div>
-        <div class="mrow"><span class="mlbl">Disease recall</span><span class="mval" style="color:var(--red)">54.3% &#9888;</span></div>
-        <div class="mrow"><span class="mlbl">AUC-ROC</span><span class="mval">0.828</span></div>
-        <div class="mrow"><span class="mlbl">CV accuracy</span><span class="mval">86.9% &plusmn;2.0%</span></div>
-        <div class="mbar"><div class="mbfill" style="width:84.2%"></div></div>
-      </div>
-    </div>
-  </div>
-  <div class="callout danger"><strong>Why SVM has 84% accuracy but only 54% recall:</strong> SVM predicts &ldquo;no disease&rdquo; for borderline cases to exploit the 91.4% majority &mdash; even with class_weight=balanced. High accuracy here is misleading. AUC and recall tell the real story. This is why we report 5 metrics, not just accuracy.</div>
-  <div style="display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:2rem">
-    <div>
-      <h3 style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:.5rem">Confusion matrix</h3>
-      <p style="font-size:13px;color:var(--gray400);margin-bottom:1rem">Random Forest &middot; 412 test patients</p>
-      <div class="cm-wrap">
-        <div class="cm">
-          <div class="cmh"></div><div class="cmh">Pred: No Disease</div><div class="cmh">Pred: Disease</div>
-          <div class="cmrl">Actual:<br>No Disease</div>
-          <div class="cmcell tn"><span class="cn">313</span><span class="cl">&#9989; True Negative<br>Correctly healthy</span></div>
-          <div class="cmcell fp"><span class="cn">64</span><span class="cl">&#9888; False Positive<br>Unnecessary alarm</span></div>
-          <div class="cmrl">Actual:<br>Disease</div>
-          <div class="cmcell fn"><span class="cn">9</span><span class="cl">&#128680; False Negative<br>Missed!</span></div>
-          <div class="cmcell tp"><span class="cn">26</span><span class="cl">&#9989; True Positive<br>Caught disease</span></div>
+  <div class="cr">
+    <div class="cc fade">
+      <div class="ct">The real vs fake dataset problem</div>
+      <div class="cs">Most student projects force a 50/50 split. We kept the real 8.6% disease rate — here's why that matters.</div>
+      <div style="display:flex;flex-direction:column;gap:1rem;padding:.5rem 0">
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-bottom:5px"><span>&#10060; Fake 50/50 split — looks balanced but misrepresents reality</span></div>
+          <div style="display:flex;gap:1px;height:32px;border-radius:6px;overflow:hidden">
+            <div style="flex:1;background:#e53935;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;font-weight:600">50% Disease</div>
+            <div style="flex:1;background:#22c55e;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;font-weight:600">50% Healthy</div>
+          </div>
+          <div style="font-size:11px;color:#e53935;margin-top:4px">The real world is NOT 50/50. This inflates accuracy scores.</div>
+        </div>
+        <div>
+          <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--dim);margin-bottom:5px"><span>&#9989; Our approach — real CDC distribution</span></div>
+          <div style="display:flex;gap:1px;height:32px;border-radius:6px;overflow:hidden">
+            <div style="width:8.6%;background:#e53935;display:flex;align-items:center;justify-content:center;font-size:10px;color:white;font-weight:600">8.6%</div>
+            <div style="flex:1;background:#22c55e;display:flex;align-items:center;justify-content:center;font-size:11px;color:white;font-weight:600">91.4% Healthy</div>
+          </div>
+          <div style="font-size:11px;color:#16a34a;margin-top:4px">Honest distribution. We handle the imbalance with <code style="background:#f1f5f9;padding:1px 4px;border-radius:3px">class_weight='balanced'</code>.</div>
         </div>
       </div>
     </div>
-    <div>
-      <h3 style="font-size:16px;font-weight:600;color:var(--navy);margin-bottom:.5rem">AUC-ROC scores</h3>
-      <p style="font-size:13px;color:var(--gray400);margin-bottom:1rem">AUC: 0.5 = random, &gt;0.8 = good, 1.0 = perfect</p>
-      <div class="ccrd" style="margin:0"><div style="height:140px"><canvas id="aucChart"></canvas></div></div>
+    <div class="cc fade">
+      <div class="ct">Why accuracy alone is a lie</div>
+      <div class="cs">This is the most important thing to understand about our results.</div>
+      <div style="font-size:13px;color:var(--dim);line-height:1.75">
+        <p style="margin-bottom:.75rem">Imagine a test with 100 patients — 91 healthy, 9 sick.</p>
+        <div style="background:#fee2e2;border-radius:8px;padding:.9rem;margin-bottom:.75rem">
+          <strong style="color:#991b1b;font-size:13px">&#10060; Bad model:</strong><br>
+          <span style="font-size:13px;color:#7f1d1d">Predicts "healthy" for EVERYONE<br>Accuracy = 91% — sounds great!<br>Sick patients caught = <strong>0 out of 9</strong></span>
+        </div>
+        <div style="background:#f0fdf4;border-radius:8px;padding:.9rem">
+          <strong style="color:#166534;font-size:13px">&#9989; Our model (Random Forest):</strong><br>
+          <span style="font-size:13px;color:#14532d">Accuracy = 82.3%<br>Sick patients caught = <strong>26 out of 35</strong> (74%)<br>This is what actually matters.</span>
+        </div>
+      </div>
     </div>
   </div>
-  <h3 style="font-size:16px;font-weight:600;color:var(--navy);margin:2.5rem 0 .5rem">Feature importance (Random Forest)</h3>
-  <p style="font-size:13px;color:var(--gray400);margin-bottom:1.5rem">Gini importance &mdash; how much each feature reduces prediction error. Red = top 5.</p>
-  <div class="fbars">
-    <div>
-      <div class="fitem"><div class="ftop"><span class="frank">#1</span><span class="fname">AgeCategory</span><div class="fbarw"><div class="fbarfill" style="width:100%;background:linear-gradient(90deg,#ef4444,#dc2626)"></div></div><span class="fpct">28.7%</span></div><div class="fdesc">Dominant predictor &mdash; disease risk rises sharply after 50.</div></div>
-      <div class="fitem"><div class="ftop"><span class="frank">#2</span><span class="fname">GenHealth</span><div class="fbarw"><div class="fbarfill" style="width:46.7%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div><span class="fpct">13.4%</span></div><div class="fdesc">Self-reported health captures overall comorbidity burden.</div></div>
-      <div class="fitem"><div class="ftop"><span class="frank">#3</span><span class="fname">DiffWalking</span><div class="fbarw"><div class="fbarfill" style="width:34.7%;background:linear-gradient(90deg,#ef4444,#f97316)"></div></div><span class="fpct">10.0%</span></div><div class="fdesc">Difficulty walking may indicate pre-existing cardiac limitation.</div></div>
+
+  <div class="call ok"><strong>The 17 questions we used:</strong> BMI, smoking, alcohol, stroke history, physical health days, mental health days, difficulty walking, sex, age group, diabetes, physical activity, general health rating, sleep hours, asthma, kidney disease, skin cancer, and race. All things the CDC asks in a normal phone survey — no blood test, no ECG needed.</div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- RISK FACTORS -->
+<section id="risk-factors" style="background:var(--ink);padding:5rem 2.5rem">
+<div class="sec">
+  <div class="stag" style="color:rgba(229,82,82,.8)">What the data reveals</div>
+  <h2 style="color:white">What actually causes heart disease risk?</h2>
+  <p class="slead">Our Random Forest model learned which features matter most. Click each one to see the real numbers from our 2,059 CDC patients &mdash; and a plain-English explanation of why.</p>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:2rem">
+    <div class="feat-list" id="feat-list">
+      <div class="feat-row active" onclick="selectFeat(0)">
+        <div><div class="feat-name">Age group</div><div class="feat-sub">Most powerful predictor</div></div>
+        <div class="feat-bar-wrap"><div class="feat-bar-fill" style="width:100%"></div></div>
+        <div class="feat-pct">28.7%</div>
+      </div>
+      <div class="feat-row" onclick="selectFeat(1)">
+        <div><div class="feat-name">General health</div><div class="feat-sub">Self-reported rating</div></div>
+        <div class="feat-bar-wrap"><div class="feat-bar-fill" style="width:46.7%"></div></div>
+        <div class="feat-pct">13.4%</div>
+      </div>
+      <div class="feat-row" onclick="selectFeat(2)">
+        <div><div class="feat-name">Difficulty walking</div><div class="feat-sub">Stairs or distances</div></div>
+        <div class="feat-bar-wrap"><div class="feat-bar-fill" style="width:34.8%"></div></div>
+        <div class="feat-pct">10.0%</div>
+      </div>
+      <div class="feat-row" onclick="selectFeat(3)">
+        <div><div class="feat-name">Physical health days</div><div class="feat-sub">Bad days in last 30</div></div>
+        <div class="feat-bar-wrap"><div class="feat-bar-fill" style="width:30.0%"></div></div>
+        <div class="feat-pct">8.6%</div>
+      </div>
+      <div class="feat-row" onclick="selectFeat(4)">
+        <div><div class="feat-name">Diabetes</div><div class="feat-sub">Shared arterial damage</div></div>
+        <div class="feat-bar-wrap"><div class="feat-bar-fill" style="width:28.6%"></div></div>
+        <div class="feat-pct">8.2%</div>
+      </div>
+      <div class="feat-row" onclick="selectFeat(5)">
+        <div><div class="feat-name">Stroke history</div><div class="feat-sub">Biggest single-flag risk</div></div>
+        <div class="feat-bar-wrap"><div class="feat-bar-fill" style="width:14.3%"></div></div>
+        <div class="feat-pct">4.1%</div>
+      </div>
     </div>
-    <div>
-      <div class="fitem"><div class="ftop"><span class="frank">#4</span><span class="fname">PhysicalHealth</span><div class="fbarw"><div class="fbarfill" style="width:30.1%;background:#f97316"></div></div><span class="fpct">8.6%</span></div><div class="fdesc">More poor physical health days correlates with chronic illness burden.</div></div>
-      <div class="fitem"><div class="ftop"><span class="frank">#5</span><span class="fname">Diabetic</span><div class="fbarw"><div class="fbarfill" style="width:28.6%;background:#f97316"></div></div><span class="fpct">8.2%</span></div><div class="fdesc">Diabetes drives arterial damage &mdash; independent cardiovascular risk factor.</div></div>
-      <div class="fitem"><div class="ftop"><span class="frank">#6</span><span class="fname">BMI</span><div class="fbarw"><div class="fbarfill" style="width:18.8%;background:#06b6d4"></div></div><span class="fpct">5.4%</span></div><div class="fdesc">Higher BMI associated with hypertension and metabolic risk.</div></div>
+
+    <div class="feat-detail" id="feat-detail">
+      <div class="fd-tag">Feature importance from Random Forest — Gini score</div>
+      <div class="fd-num" id="fd-num">31.6%</div>
+      <div class="fd-label" id="fd-label">DISEASE RATE IN 80+ AGE GROUP</div>
+      <div class="fd-title" id="fd-title">Age is the #1 predictor — by far</div>
+      <div class="fd-desc" id="fd-desc">Think of it like this: a 25-year-old and an 85-year-old both fill out the same 17 questions. Even if everything else is identical, age alone shifts the risk enormously. In our 2,059 CDC patients, only 0.6% of 18–24 year-olds had heart disease. But 31.6% of people aged 80+ did. The model learned this pattern from real data.</div>
+      <div class="fd-vs" id="fd-vs">
+        <div class="fdv hi"><span class="n">31.6%</span><span class="l">Disease rate age 80+</span></div>
+        <div class="fdv lo"><span class="n">0.6%</span><span class="l">Disease rate age 18–24</span></div>
+      </div>
     </div>
   </div>
 </div>
@@ -391,91 +394,283 @@ footer strong{color:rgba(255,255,255,.7)}footer a{color:rgba(255,255,255,.5);tex
 
 <div class="divider"></div>
 
-<section id="calculator">
-<div class="inner">
-  <div class="sec-eyebrow" style="color:var(--teal)">Interactive Tool</div>
-  <h2>Personal Risk Calculator</h2>
-  <p class="sec-lead">Enter your information below. Our model estimates your heart disease risk based on CDC population patterns. <strong style="color:rgba(255,255,255,.5)">Educational purposes only &mdash; not a medical diagnosis.</strong></p>
-  <div class="calc-grid">
+<!-- DATA CHARTS -->
+<section id="data">
+<div class="sec">
+  <div class="stag">Data Exploration</div>
+  <h2>What we found in the data</h2>
+  <p class="slead">Before training any model, we explored the data visually. These charts show the real patterns from our 2,059 CDC patients &mdash; every number is from our actual dataset.</p>
+
+  <div class="cr">
+    <div class="cc fade">
+      <div class="ct">Disease rate climbs with age</div>
+      <div class="cs">From 0.6% in young adults to 31.6% in the 80+ group. This is why age is our #1 feature.</div>
+      <div style="height:200px;position:relative"><canvas id="ageChart" role="img" aria-label="Line chart showing disease rate by age group, from 0.6% at 18-24 to 31.6% at 80+">Disease rate rises from 0.6% in the 18-24 age group to 31.6% in the 80+ group.</canvas></div>
+    </div>
+    <div class="cc fade">
+      <div class="ct">General health rating predicts disease</div>
+      <div class="cs">Patients who rated their health as "Poor" had a 32.1% disease rate — 15 times higher than "Excellent" at 2.1%.</div>
+      <div style="height:200px;position:relative"><canvas id="ghChart" role="img" aria-label="Bar chart of disease rate by general health: Poor 32.1%, Excellent 2.1%">Poor health: 32.1% disease rate. Excellent health: 2.1%.</canvas></div>
+    </div>
+  </div>
+  <div class="cr">
+    <div class="cc fade">
+      <div class="ct">Having a stroke raises risk 6 times</div>
+      <div class="cs">Stroke patients in our data: 38.2% disease rate. Those without a stroke history: 6.1%.</div>
+      <div class="leg"><span class="li"><span class="lsq" style="background:#e53935"></span>Has disease (%)</span><span class="li"><span class="lsq" style="background:#22c55e"></span>No disease (%)</span></div>
+      <div style="height:180px;position:relative"><canvas id="riskChart" role="img" aria-label="Grouped bar chart showing disease rates for stroke, diabetes, walking difficulty, and other factors">Stroke patients: 38.2% disease rate vs 6.1% for those without.</canvas></div>
+    </div>
+    <div class="cc fade">
+      <div class="ct">Feature importance — what the model learned</div>
+      <div class="cs">After GridSearchCV tuning, these are the features that reduced prediction error the most.</div>
+      <div style="height:180px;position:relative"><canvas id="fiChart" role="img" aria-label="Horizontal bar chart of feature importance: Age 28.7%, GenHealth 13.4%, DiffWalking 10.0%">Top features: Age 28.7%, General Health 13.4%, Difficulty Walking 10.0%</canvas></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- MODELS -->
+<section id="models">
+<div class="sec">
+  <div class="stag">The Three Models</div>
+  <h2>How the machine learning works</h2>
+  <p class="slead">We trained three different types of classifiers. Each one learns differently. Click a model to see how it works explained simply, what it scored, and why we picked the winner.</p>
+
+  <div class="model-switcher">
+    <button class="msw-btn active" onclick="switchModel('lr')">Logistic Regression</button>
+    <button class="msw-btn" onclick="switchModel('rf')">Random Forest</button>
+    <button class="msw-btn" onclick="switchModel('svm')">SVM</button>
+  </div>
+
+  <!-- LR detail -->
+  <div class="model-detail show" id="md-lr">
+    <div class="md-head">
+      <div><div class="md-title">Logistic Regression</div><div class="md-sub">Simple, fast, interpretable &mdash; best params: C = 0.01</div></div>
+    </div>
+    <div class="md-body">
+      <div class="md-explain">
+        <h4>How it works — in plain English</h4>
+        <p>Logistic Regression draws a single straight line (or flat surface in many dimensions) that tries to separate sick patients from healthy ones. Every feature gets a weight — like a score. Add up all the weighted scores, and if the total is above a threshold, predict "disease".</p>
+        <div class="analogy"><strong>Think of it like a points system.</strong> Being over 70 adds +15 points. Having diabetes adds +8 points. Exercising regularly subtracts 4 points. If your total hits 20, the model flags you as high risk. Simple, transparent, and explainable to any doctor.</div>
+        <h4 style="margin-top:1rem">Why we included it</h4>
+        <p>It's the interpretable baseline. Every coefficient is readable. Doctors can understand exactly why a patient was flagged. It also achieved the highest disease recall (80%) — meaning it catches the most sick patients, which matters most in medicine.</p>
+        <h4 style="margin-top:1rem">What C=0.01 means</h4>
+        <p>C controls how flexible the model is. C=0.01 means strong regularisation — the model stays simple and doesn't chase every quirk in the training data. This prevents overfitting given we only have 177 disease patients to learn from.</p>
+      </div>
+      <div class="md-metrics">
+        <div class="metric-big"><div class="mb-n" style="color:#22c55e">80.0%</div><div class="mb-l">Disease recall — catches the most sick patients</div><div class="mb-bar"><div class="mb-fill" style="width:80%;background:#22c55e"></div></div></div>
+        <div class="metric-big"><div class="mb-n" style="color:var(--ink)">76.5%</div><div class="mb-l">Test accuracy on 412 unseen patients</div><div class="mb-bar"><div class="mb-fill" style="width:76.5%;background:var(--dim2)"></div></div></div>
+        <div class="metric-big"><div class="mb-n" style="color:var(--ink)">0.849</div><div class="mb-l">AUC-ROC — discrimination ability</div><div class="mb-bar"><div class="mb-fill" style="width:84.9%;background:var(--dim2)"></div></div></div>
+        <div class="metric-big"><div class="mb-n" style="color:var(--dim)">77.5%</div><div class="mb-l">5-fold CV accuracy &plusmn;1.3%</div><div class="mb-bar"><div class="mb-fill" style="width:77.5%;background:var(--border)"></div></div></div>
+        <div class="call ok" style="margin:.75rem 0 0"><strong>Best for:</strong> When you need to explain to a doctor exactly why a patient was flagged.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RF detail -->
+  <div class="model-detail" id="md-rf">
+    <div class="md-head">
+      <div><div class="md-title">Random Forest &#9733; Best AUC</div><div class="md-sub">Ensemble of trees &mdash; best params: depth=5, n=100, min_split=10</div></div>
+      <span class="mbadge">Best overall</span>
+    </div>
+    <div class="md-body">
+      <div class="md-explain">
+        <h4>How it works — in plain English</h4>
+        <p>A Random Forest builds 100 decision trees, each one trained on a slightly different random slice of the data. Each tree votes on whether a patient has heart disease. The final answer is the majority vote across all 100 trees.</p>
+        <div class="analogy"><strong>Think of it like asking 100 doctors.</strong> Each doctor only sees a random selection of your test results. Some focus on your age and BMI. Others focus on your diabetes and stroke history. You go with whatever diagnosis the majority reaches. No single doctor's bias dominates the result.</div>
+        <h4 style="margin-top:1rem">Why max_depth=5?</h4>
+        <p>Without a depth limit, trees memorise the training data instead of learning patterns. Limiting each tree to 5 levels keeps them general enough to work on new, unseen patients — the 412 test patients it had never seen before.</p>
+        <h4 style="margin-top:1rem">Why it's the best model</h4>
+        <p>It has the highest AUC-ROC (0.855) — meaning it is the best at separating sick patients from healthy ones across every possible decision threshold. It also provides feature importance scores, which is how we know age is 28.7% of the prediction.</p>
+      </div>
+      <div class="md-metrics">
+        <div class="metric-big"><div class="mb-n" style="color:var(--red)">0.855</div><div class="mb-l">AUC-ROC &#9733; Best of all three models</div><div class="mb-bar"><div class="mb-fill" style="width:85.5%;background:var(--red)"></div></div></div>
+        <div class="metric-big"><div class="mb-n" style="color:var(--red)">82.3%</div><div class="mb-l">Test accuracy on 412 unseen patients</div><div class="mb-bar"><div class="mb-fill" style="width:82.3%;background:var(--red)"></div></div></div>
+        <div class="metric-big"><div class="mb-n" style="color:var(--ink)">74.3%</div><div class="mb-l">Disease recall — sick patients caught</div><div class="mb-bar"><div class="mb-fill" style="width:74.3%;background:var(--dim2)"></div></div></div>
+        <div class="metric-big"><div class="mb-n" style="color:var(--dim)">82.6%</div><div class="mb-l">5-fold CV accuracy &plusmn;1.6%</div><div class="mb-bar"><div class="mb-fill" style="width:82.6%;background:var(--border)"></div></div></div>
+        <div class="call" style="margin:.75rem 0 0;border-left-color:var(--red)"><strong>Best for:</strong> Highest AUC and best overall balance. Also gives us feature importance — the only model that can explain which features matter most.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SVM detail -->
+  <div class="model-detail" id="md-svm">
+    <div class="md-head">
+      <div><div class="md-title">Support Vector Machine (SVM)</div><div class="md-sub">RBF kernel &mdash; best params: C=0.1, gamma=0.001</div></div>
+    </div>
+    <div class="md-body">
+      <div class="md-explain">
+        <h4>How it works — in plain English</h4>
+        <p>SVM tries to find the widest possible gap (margin) between sick and healthy patients in a high-dimensional space. The RBF kernel lets it bend this boundary into curves, handling non-linear patterns.</p>
+        <div class="analogy"><strong>Think of it like sorting red and blue marbles.</strong> SVM tries to place a dividing wall between them, as far as possible from any marble on either side. The RBF kernel lets that wall be curved, not just flat — so it can separate complicated shapes.</div>
+        <h4 style="margin-top:1rem">The accuracy trap</h4>
+        <p>SVM scored 84.2% test accuracy — the highest of all three. But this is misleading. With 91.4% of patients healthy, SVM learned to predict "no disease" for borderline cases to maximise accuracy. Its disease recall is only 54.3% — it misses nearly half of sick patients.</p>
+        <h4 style="margin-top:1rem">Why we still included it</h4>
+        <p>Comparing all three models is required, and SVM teaches us a crucial lesson about why accuracy alone is not enough. The SVM result is the strongest argument for using AUC and recall as primary metrics.</p>
+      </div>
+      <div class="md-metrics">
+        <div class="metric-big"><div class="mb-n" style="color:#f59e0b">54.3%</div><div class="mb-l">Disease recall &#9888; Misses 46% of sick patients</div><div class="mb-bar"><div class="mb-fill" style="width:54.3%;background:#f59e0b"></div></div></div>
+        <div class="metric-big"><div class="mb-n" style="color:var(--ink)">84.2%</div><div class="mb-l">Test accuracy — looks best but is misleading</div><div class="mb-bar"><div class="mb-fill" style="width:84.2%;background:var(--dim2)"></div></div></div>
+        <div class="metric-big"><div class="mb-n" style="color:var(--ink)">0.828</div><div class="mb-l">AUC-ROC — actually lowest of the three</div><div class="mb-bar"><div class="mb-fill" style="width:82.8%;background:var(--dim2)"></div></div></div>
+        <div class="metric-big"><div class="mb-n" style="color:var(--dim)">86.9%</div><div class="mb-l">5-fold CV accuracy &plusmn;2.0%</div><div class="mb-bar"><div class="mb-fill" style="width:86.9%;background:var(--border)"></div></div></div>
+        <div class="call am" style="margin:.75rem 0 0"><strong>Key lesson:</strong> 84% accuracy sounds great but 54% recall means nearly half of sick patients get told they're fine. This is exactly why we don't use accuracy as our only metric.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Confusion matrix -->
+  <div style="display:grid;grid-template-columns:auto 1fr;gap:2rem;align-items:start;margin-top:1.5rem">
+    <div class="fade">
+      <h3 style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:.4rem">Confusion matrix — Random Forest</h3>
+      <p style="font-size:12px;color:var(--dim2);margin-bottom:1rem">412 test patients. The red box (bottom-left) is the one we minimise — these are sick patients told they are fine.</p>
+      <div style="background:var(--white);border:1px solid var(--border);border-radius:12px;padding:1.4rem;display:inline-block">
+        <div class="cm">
+          <div class="cmh"></div><div class="cmh">Predicted: Healthy</div><div class="cmh">Predicted: Disease</div>
+          <div class="cmrl">Actual:<br>Healthy</div>
+          <div class="cmc tn"><span class="cn">313</span><span class="cl">&#9989; Correct<br>Told healthy, are healthy</span></div>
+          <div class="cmc fp"><span class="cn">64</span><span class="cl">&#9888; False alarm<br>Told sick, were healthy</span></div>
+          <div class="cmrl">Actual:<br>Disease</div>
+          <div class="cmc fn"><span class="cn">9</span><span class="cl">&#128680; Missed!<br>Told healthy, are sick</span></div>
+          <div class="cmc tp"><span class="cn">26</span><span class="cl">&#9989; Correct<br>Told sick, are sick</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="fade">
+      <h3 style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:.4rem">AUC-ROC comparison — all three models</h3>
+      <p style="font-size:12px;color:var(--dim2);margin-bottom:1rem">AUC = how well the model separates sick from healthy at any threshold. 0.5 = random guess. 1.0 = perfect. All three are above 0.82.</p>
+      <div class="cc" style="margin:0"><div style="height:150px;position:relative"><canvas id="aucChart" role="img" aria-label="Horizontal bar chart of AUC scores: RF 0.855, LR 0.849, SVM 0.828">Random Forest: 0.855. Logistic Regression: 0.849. SVM: 0.828.</canvas></div></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- METHODOLOGY -->
+<section id="method">
+<div class="sec">
+  <div class="stag">Methodology</div>
+  <h2>How we built it — step by step</h2>
+  <p class="slead">Six stages from raw CDC data to a validated model. Every decision is explained.</p>
+  <div class="msteps">
+    <div class="ms"><span class="msn">01</span><span class="msi">&#128229;</span><span class="msname">Sample</span><span class="msd">2,059 at real 8.6% rate from 319,795</span></div>
+    <div class="ms"><span class="msn">02</span><span class="msi">&#128269;</span><span class="msname">EDA</span><span class="msd">Explore charts, check distributions, zero missing</span></div>
+    <div class="ms"><span class="msn">03</span><span class="msi">&#128288;</span><span class="msname">Encode</span><span class="msd">Ordinal ages &amp; health, binary yes/no, one-hot race</span></div>
+    <div class="ms"><span class="msn">04</span><span class="msi">&#9986;</span><span class="msname">Split 80/20</span><span class="msd">1,647 train · 412 test (stratified)</span></div>
+    <div class="ms"><span class="msn">05</span><span class="msi">&#9878;</span><span class="msname">Scale</span><span class="msd">StandardScaler on train only — no data leakage</span></div>
+    <div class="ms"><span class="msn">06</span><span class="msi">&#127919;</span><span class="msname">GridSearch</span><span class="msd">F1 scoring · 5-fold · class_weight=balanced</span></div>
+  </div>
+  <div class="call"><strong>Why GridSearchCV?</strong> Instead of guessing the right model settings, we systematically test every combination. For Random Forest alone we tested 3 n_estimators × 4 depths × 3 split sizes = 36 combinations, each evaluated across 5 cross-validation folds. GridSearchCV picked the best automatically.</div>
+  <div class="call am" style="margin-top:.75rem"><strong>Why F1 for tuning?</strong> F1-score balances catching sick patients (recall) with not crying wolf too often (precision). If we tuned on accuracy, the model would just learn to predict "no disease" for everyone and score 91.4%. F1 forces it to actually learn the minority class.</div>
+</div>
+</section>
+
+<div class="divider"></div>
+
+<!-- CALCULATOR -->
+<section id="calculator" class="calc-sec">
+<div class="sec">
+  <div class="stag" style="color:rgba(239,83,80,.8)">Interactive Tool</div>
+  <h2>Check your heart disease risk</h2>
+  <p class="slead">Our Logistic Regression model — trained on 1,647 real CDC patients — estimates your risk. The "what if" panel shows exactly which changes would help most.</p>
+  <div class="cg">
     <div>
-      <div class="calc-card">
-        <div class="calc-section-title">&#128203; Basic Information</div>
-        <div class="form-group">
-          <label class="form-label">Age Group</label>
-          <select class="form-control" id="c-age" onchange="updateRisk()">
-            <option value="0">18 &ndash; 24</option><option value="1">25 &ndash; 29</option><option value="2">30 &ndash; 34</option>
-            <option value="3">35 &ndash; 39</option><option value="4">40 &ndash; 44</option><option value="5">45 &ndash; 49</option>
-            <option value="6" selected>50 &ndash; 54</option><option value="7">55 &ndash; 59</option><option value="8">60 &ndash; 64</option>
-            <option value="9">65 &ndash; 69</option><option value="10">70 &ndash; 74</option><option value="11">75 &ndash; 79</option>
+      <div class="cpanel">
+        <div class="cptitle">Basic information</div>
+        <div class="fg">
+          <label class="fl">Age group<span id="v-age">50–54</span></label>
+          <select id="c-age" onchange="updateRisk()">
+            <option value="0">18–24 years old</option><option value="1">25–29</option><option value="2">30–34</option>
+            <option value="3">35–39</option><option value="4">40–44</option><option value="5">45–49</option>
+            <option value="6" selected>50–54</option><option value="7">55–59</option><option value="8">60–64</option>
+            <option value="9">65–69</option><option value="10">70–74</option><option value="11">75–79</option>
             <option value="12">80 or older</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Sex</label>
-          <select class="form-control" id="c-sex" onchange="updateRisk()">
+        <div class="fg">
+          <label class="fl">How would you rate your general health?<span id="v-gh">Good</span></label>
+          <select id="c-gh" onchange="updateRisk()">
+            <option value="0">Poor — I'm often unwell</option>
+            <option value="1">Fair — some ongoing health issues</option>
+            <option value="2" selected>Good — generally healthy</option>
+            <option value="3">Very good — only minor issues</option>
+            <option value="4">Excellent — rarely ever sick</option>
+          </select>
+        </div>
+        <div class="fg">
+          <label class="fl">Sex<span id="v-sex">Male</span></label>
+          <select id="c-sex" onchange="updateRisk()">
             <option value="0">Female</option><option value="1" selected>Male</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">BMI &mdash; <span id="bmi-val" style="color:var(--teal)">28.0</span></label>
-          <input type="range" class="form-range" id="c-bmi" min="15" max="55" value="28" step="0.5" oninput="document.getElementById('bmi-val').textContent=parseFloat(this.value).toFixed(1);updateRisk()">
-          <div class="range-labels"><span>15 (underweight)</span><span>55 (obese)</span></div>
-        </div>
-        <div class="form-group">
-          <label class="form-label">General Health</label>
-          <select class="form-control" id="c-genhealth" onchange="updateRisk()">
-            <option value="0">Poor</option><option value="1">Fair</option><option value="2" selected>Good</option>
-            <option value="3">Very good</option><option value="4">Excellent</option>
+        <div class="fg">
+          <label class="fl">Diabetes status<span id="v-diab">No</span></label>
+          <select id="c-diab" onchange="updateRisk()">
+            <option value="0" selected>No diabetes</option>
+            <option value="1">Borderline or gestational</option>
+            <option value="2">Yes, I have diabetes</option>
           </select>
         </div>
-        <div class="form-group">
-          <label class="form-label">Diabetic Status</label>
-          <select class="form-control" id="c-diabetic" onchange="updateRisk()">
-            <option value="0" selected>No</option><option value="1">Borderline / Gestational</option><option value="2">Yes</option>
-          </select>
+        <div class="fg">
+          <label class="fl">BMI (weight ÷ height²)<span id="v-bmi" style="color:var(--red3);font-family:var(--mono)">28.0</span></label>
+          <input type="range" id="c-bmi" min="15" max="55" value="28" step="0.5" oninput="document.getElementById('v-bmi').textContent=parseFloat(this.value).toFixed(1);updateRisk()">
+          <div class="rl"><span>15 — underweight</span><span>28 — average</span><span>55 — very obese</span></div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Poor Physical Health Days &mdash; <span id="ph-val" style="color:var(--teal)">0</span></label>
-          <input type="range" class="form-range" id="c-phys" min="0" max="30" value="0" oninput="document.getElementById('ph-val').textContent=this.value;updateRisk()">
-          <div class="range-labels"><span>0 days</span><span>30 days</span></div>
+        <div class="fg">
+          <label class="fl">Days of poor physical health (last 30)<span id="v-ph" style="color:var(--red3);font-family:var(--mono)">0</span></label>
+          <input type="range" id="c-ph" min="0" max="30" value="0" step="1" oninput="document.getElementById('v-ph').textContent=this.value;updateRisk()">
+          <div class="rl"><span>0 days</span><span>15</span><span>30 days</span></div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Poor Mental Health Days &mdash; <span id="mh-val" style="color:var(--teal)">0</span></label>
-          <input type="range" class="form-range" id="c-mental" min="0" max="30" value="0" oninput="document.getElementById('mh-val').textContent=this.value;updateRisk()">
-          <div class="range-labels"><span>0 days</span><span>30 days</span></div>
+        <div class="fg">
+          <label class="fl">Days of poor mental health (last 30)<span id="v-mh" style="color:var(--red3);font-family:var(--mono)">0</span></label>
+          <input type="range" id="c-mh" min="0" max="30" value="0" step="1" oninput="document.getElementById('v-mh').textContent=this.value;updateRisk()">
+          <div class="rl"><span>0 days</span><span>15</span><span>30 days</span></div>
         </div>
-        <div class="form-group">
-          <label class="form-label">Sleep Hours/Night &mdash; <span id="sl-val" style="color:var(--teal)">7</span></label>
-          <input type="range" class="form-range" id="c-sleep" min="1" max="24" value="7" oninput="document.getElementById('sl-val').textContent=this.value;updateRisk()">
-          <div class="range-labels"><span>1 hr</span><span>24 hrs</span></div>
+        <div class="fg">
+          <label class="fl">Average hours of sleep per night<span id="v-sl" style="color:var(--red3);font-family:var(--mono)">7</span></label>
+          <input type="range" id="c-sl" min="1" max="24" value="7" step="1" oninput="document.getElementById('v-sl').textContent=this.value;updateRisk()">
+          <div class="rl"><span>1 hr</span><span>7 (recommended)</span><span>24</span></div>
         </div>
       </div>
+      <div class="cpanel" style="margin-top:1rem">
+        <div class="cptitle">Medical history &amp; lifestyle</div>
+        <div class="tr"><div class="tlab">Smoked at least 100 cigarettes in your life<small>Smoking damages arteries and heart muscle</small></div><label class="tog"><input type="checkbox" id="c-sm" onchange="updateRisk()"><span class="ts"></span></label></div>
+        <div class="tr"><div class="tlab">Heavy alcohol drinker (14+/week men, 7+/week women)<small>Heavy drinking weakens the heart muscle</small></div><label class="tog"><input type="checkbox" id="c-al" onchange="updateRisk()"><span class="ts"></span></label></div>
+        <div class="tr"><div class="tlab">Ever told you had a stroke<small>38.2% of stroke patients also have heart disease</small></div><label class="tog"><input type="checkbox" id="c-st" onchange="updateRisk()"><span class="ts"></span></label></div>
+        <div class="tr"><div class="tlab">Difficulty walking or climbing stairs<small>22.1% disease rate vs 7.2% without difficulty</small></div><label class="tog"><input type="checkbox" id="c-wk" onchange="updateRisk()"><span class="ts"></span></label></div>
+        <div class="tr"><div class="tlab">Exercise in past 30 days (outside of work)<small>No exercise = 14.2% rate vs 7.8% with exercise</small></div><label class="tog"><input type="checkbox" id="c-ac" checked onchange="updateRisk()"><span class="ts"></span></label></div>
+        <div class="tr"><div class="tlab">Ever told you had asthma<small>Respiratory conditions linked to heart risk</small></div><label class="tog"><input type="checkbox" id="c-as" onchange="updateRisk()"><span class="ts"></span></label></div>
+        <div class="tr"><div class="tlab">Ever told you had kidney disease<small>Shared vascular damage mechanism</small></div><label class="tog"><input type="checkbox" id="c-kd" onchange="updateRisk()"><span class="ts"></span></label></div>
+        <div class="tr"><div class="tlab">Ever told you had skin cancer<small>Some shared cardiovascular associations</small></div><label class="tog"><input type="checkbox" id="c-sc" onchange="updateRisk()"><span class="ts"></span></label></div>
+      </div>
     </div>
+
     <div>
-      <div class="calc-card" style="margin-bottom:1rem">
-        <div class="calc-section-title">&#127973; Medical History &amp; Lifestyle</div>
-        <div class="toggle-row"><span class="toggle-label">Smoked &ge; 100 cigarettes lifetime</span><label class="toggle"><input type="checkbox" id="c-smoking" onchange="updateRisk()"><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Heavy alcohol drinker</span><label class="toggle"><input type="checkbox" id="c-alcohol" onchange="updateRisk()"><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Ever had a stroke</span><label class="toggle"><input type="checkbox" id="c-stroke" onchange="updateRisk()"><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Difficulty walking or climbing stairs</span><label class="toggle"><input type="checkbox" id="c-walking" onchange="updateRisk()"><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Exercise in past 30 days (outside work)</span><label class="toggle"><input type="checkbox" id="c-activity" checked onchange="updateRisk()"><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Ever had asthma</span><label class="toggle"><input type="checkbox" id="c-asthma" onchange="updateRisk()"><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Ever had kidney disease</span><label class="toggle"><input type="checkbox" id="c-kidney" onchange="updateRisk()"><span class="toggle-slider"></span></label></div>
-        <div class="toggle-row"><span class="toggle-label">Ever had skin cancer</span><label class="toggle"><input type="checkbox" id="c-skin" onchange="updateRisk()"><span class="toggle-slider"></span></label></div>
-      </div>
-      <div class="calc-result">
-        <div class="result-label">Estimated Risk Score</div>
-        <div class="result-gauge">
-          <svg class="gauge-svg" viewBox="0 0 140 140">
-            <circle class="gauge-bg" cx="70" cy="70" r="54"/>
-            <circle class="gauge-fill" id="gauge-circle" cx="70" cy="70" r="54" stroke-dasharray="339.3" stroke-dashoffset="339.3" stroke="#06b6d4"/>
+      <div class="rpanel">
+        <div class="gw">
+          <svg class="gsvg" viewBox="0 0 160 160">
+            <circle class="gbg" cx="80" cy="80" r="62"/>
+            <circle class="gfg" id="gauge-fg" cx="80" cy="80" r="62" stroke-dasharray="389.6" stroke-dashoffset="389.6" stroke="#e53935"/>
           </svg>
-          <div class="result-pct"><span class="result-num" id="risk-pct">0%</span><span class="result-unit">risk score</span></div>
+          <div class="gc"><span class="gpct" id="gauge-pct">0%</span><span class="gunit">risk score</span></div>
         </div>
-        <div class="result-risk" id="risk-label" style="color:var(--teal)">Calculating...</div>
-        <div class="result-msg" id="risk-msg">Adjust the sliders and toggles to see your estimated risk.</div>
+        <div class="rlev">
+          <div class="rlabel" id="risk-label">Calculating...</div>
+          <div class="rdesc" id="risk-desc">Fill in your details to see your estimated risk.</div>
+        </div>
+        <div class="fbd">
+          <div class="fbd-t">What's driving your score</div>
+          <div id="factor-bd"></div>
+        </div>
       </div>
-      <p class="disclaimer">&#9888; Educational purposes only. Not a medical device or diagnosis. Consult a qualified healthcare professional.</p>
+
+      <div class="rpanel" style="margin-top:1rem">
+        <div class="wit">What if you made these changes?</div>
+        <div id="whatif-rows"></div>
+        <p style="font-size:11px;color:rgba(255,255,255,.2);margin-top:1rem;text-align:center;line-height:1.6">&#9888; Educational only &mdash; not a medical diagnosis. Consult a doctor.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -483,32 +678,33 @@ footer strong{color:rgba(255,255,255,.7)}footer a{color:rgba(255,255,255,.5);tex
 
 <div class="divider"></div>
 
-<section id="ethics" class="bg-white">
-<div class="inner">
-  <div class="sec-eyebrow">Ethics</div>
-  <h2>Responsible AI in healthcare</h2>
-  <p class="sec-lead">A model that makes health predictions carries serious responsibilities. We address five key ethical dimensions before any clinical deployment could be considered.</p>
-  <div class="ethics-grid">
-    <div class="ecrd"><span class="eicon">&#9878;</span><div class="etitle">Bias &amp; Fairness</div><div class="ebody">The dataset covers US respondents and includes race as a feature. Disparities in healthcare access across racial and socioeconomic groups may cause the model to perform differently for different subpopulations. Subgroup evaluation is required before any deployment (Barocas et al., 2019).</div></div>
-    <div class="ecrd"><span class="eicon">&#128203;</span><div class="etitle">Self-Reported Data Limitations</div><div class="ebody">Unlike clinical datasets, BRFSS uses telephone surveys. Respondents may under-report behaviours, have undiagnosed conditions, or recall inaccurately. This inherent noise limits model accuracy &mdash; a well-understood limitation of population health surveys.</div></div>
-    <div class="ecrd"><span class="eicon">&#128680;</span><div class="etitle">False Negatives Are Dangerous</div><div class="ebody">A false negative &mdash; predicting no disease when disease is present &mdash; could delay treatment. This is why we optimise for F1-score, use class_weight=balanced, and report disease recall separately. The threshold can be lowered to catch more sick patients.</div></div>
-    <div class="ecrd"><span class="eicon">&#128274;</span><div class="etitle">Privacy &mdash; GDPR &amp; HIPAA</div><div class="ebody">Any real deployment handles protected health data subject to EU GDPR (right to explanation, data minimisation) and US HIPAA (access controls, audit trails). The physician always makes the final call &mdash; this model is decision support only.</div></div>
+<!-- ETHICS -->
+<section id="ethics">
+<div class="sec">
+  <div class="stag">Responsible AI</div>
+  <h2>What we can't claim &mdash; and why that matters</h2>
+  <p class="slead">Being honest about the limits of your model is just as important as the results. Here's what we'd need to address before this could ever be used in a real clinic.</p>
+  <div class="eg">
+    <div class="ec fade"><span class="ei">&#9878;</span><div class="et">The data isn't everyone</div><div class="eb">Our CDC data is mostly US respondents and includes race as a feature. The model may predict less accurately for people outside the US, or for racial and income groups underrepresented in the survey. Before deploying in a hospital, you'd need to test on a more diverse dataset (Barocas et al., 2019).</div></div>
+    <div class="ec fade"><span class="ei">&#128203;</span><div class="et">People don't always tell the truth on surveys</div><div class="eb">The CDC data comes from phone interviews. People under-report smoking, alcohol, and other habits. Some may not know they have undiagnosed conditions. This "noise" is part of why our accuracy is ~82% rather than the 90%+ you'd get from actual blood test data.</div></div>
+    <div class="ec fade"><span class="ei">&#128680;</span><div class="et">Missing a sick person is worse than a false alarm</div><div class="eb">If we predict "healthy" for someone who actually has heart disease, they might not get treated in time. That's why we track disease recall separately and tuned on F1-score. In a real deployment, you'd lower the decision threshold below 50% to catch more sick people, even at the cost of more false alarms.</div></div>
+    <div class="ec fade"><span class="ei">&#128274;</span><div class="et">A tool, not a doctor</div><div class="eb">This model would support a doctor's decision — never replace it. EU GDPR and US HIPAA both require that any automated health system provides an explanation for its decision and that a qualified human reviews it. The risk calculator on this page is for educational use only.</div></div>
   </div>
 </div>
 </section>
 
 <div class="divider"></div>
 
-<section class="bg-gray">
-<div class="inner">
-  <div class="sec-eyebrow">Team</div>
+<section>
+<div class="sec">
+  <div class="stag">Team</div>
   <h2>Project team</h2>
-  <p class="sec-lead">Hochschule Pforzheim &middot; BIS3012 &middot; Prof. Dr. Dustin van der Haar &middot; 2026</p>
-  <div class="tgrid">
-    <div class="tcrd"><div class="tavatar" style="background:linear-gradient(135deg,#0e7490,#0a1628)">K</div><div class="tname">Karim</div><div class="trole">Data Engineer</div></div>
-    <div class="tcrd"><div class="tavatar" style="background:linear-gradient(135deg,#7c3aed,#0a1628)">Ku</div><div class="tname">Kushul</div><div class="trole">Code Review &amp; QA</div></div>
-    <div class="tcrd"><div class="tavatar" style="background:linear-gradient(135deg,#dc2626,#0a1628)">T</div><div class="tname">Tarik</div><div class="trole">Presentation</div></div>
-    <div class="tcrd"><div class="tavatar" style="background:linear-gradient(135deg,#16a34a,#0a1628)">M</div><div class="tname">Max</div><div class="trole">Report &amp; Ethics</div></div>
+  <p class="slead">Hochschule Pforzheim &middot; BIS3012 &middot; Prof. Dr. Dustin van der Haar &middot; 2026</p>
+  <div class="tg">
+    <div class="tcard fade"><div class="tav" style="background:linear-gradient(135deg,#0e7490,#0a1628)">K</div><div class="tname">Karim</div><div class="trole">Data Engineer</div></div>
+    <div class="tcard fade"><div class="tav" style="background:linear-gradient(135deg,#7c3aed,#0a1628)">Ku</div><div class="tname">Kushul</div><div class="trole">Code Review &amp; QA</div></div>
+    <div class="tcard fade"><div class="tav" style="background:linear-gradient(135deg,#dc2626,#0a1628)">T</div><div class="tname">Tarik</div><div class="trole">Presentation</div></div>
+    <div class="tcard fade"><div class="tav" style="background:linear-gradient(135deg,#16a34a,#0a1628)">M</div><div class="tname">Max</div><div class="trole">Report &amp; Ethics</div></div>
   </div>
 </div>
 </section>
@@ -516,67 +712,102 @@ footer strong{color:rgba(255,255,255,.7)}footer a{color:rgba(255,255,255,.5);tex
 <footer>
   <strong>CardioML &mdash; Heart Disease Classification</strong><br>
   Hochschule Pforzheim &middot; BIS3012 &middot; Prof. Dr. Dustin van der Haar &middot; 2026<br>
-  Data: <a href="https://www.kaggle.com/datasets/kamilpytlak/personal-key-indicators-of-heart-disease">CDC BRFSS 2020</a> via Kaggle (Kamilpytlak, 2021) &middot; 319,795 US survey responses<br>
-  Methods: scikit-learn &middot; GridSearchCV &middot; 5-fold stratified CV &middot; class_weight=balanced<br>
-  <span style="font-size:11px;opacity:.5">&#9888; Educational purposes only. Not a medical device.</span>
+  Data: <a href="https://www.kaggle.com/datasets/kamilpytlak/personal-key-indicators-of-heart-disease">CDC Behavioral Risk Factor Surveillance System 2020</a> (Kamilpytlak, 2021) &middot; 319,795 US survey respondents<br>
+  Methods: scikit-learn &middot; GridSearchCV (F1) &middot; 5-fold stratified CV &middot; class_weight=balanced<br>
+  <span style="font-size:11px;opacity:.4">Educational purposes only. Not a medical device or diagnosis tool.</span>
 </footer>
 
 <script>
 Chart.defaults.font.family="'Inter',sans-serif";Chart.defaults.font.size=12;Chart.defaults.color='#64748b';
-const GREEN='#22c55e',RED='#ef4444',TEAL='#06b6d4',GRAY='#94a3b8',GRAY2='#64748b';
-new Chart(document.getElementById('distChart'),{type:'doughnut',data:{labels:['No Disease (91.4%)','Heart Disease (8.6%)'],datasets:[{data:[1882,177],backgroundColor:[GREEN,RED],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,cutout:'68%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.label}: ${c.raw} patients`}}}}});
-new Chart(document.getElementById('ageChart'),{type:'line',data:{labels:['18-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60-64','65-69','70-74','75-79','80+'],datasets:[{data:[0.6,1.2,1.5,2.1,3.2,4.8,7.1,10.3,14.2,18.5,23.1,27.4,31.6],borderColor:RED,backgroundColor:'rgba(239,68,68,0.1)',tension:.4,fill:true,pointRadius:5,pointBackgroundColor:RED,pointBorderColor:'white',pointBorderWidth:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{maxRotation:45,font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%',font:{size:10}},min:0,max:35}}}});
-new Chart(document.getElementById('ghChart'),{type:'bar',data:{labels:['Poor','Fair','Good','Very good','Excellent'],datasets:[{data:[32.1,18.4,8.7,4.2,2.1],backgroundColor:['#dc2626','#ef4444','#f97316','#22c55e','#16a34a'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%'},max:40}}}});
-new Chart(document.getElementById('riskChart'),{type:'bar',data:{labels:['Stroke','Diff Walking','Diabetic','Kidney Dis.','Asthma','Smoking'],datasets:[{label:'Has disease',data:[38.2,22.1,18.6,20.4,12.3,11.8],backgroundColor:RED,borderRadius:4,borderSkipped:false},{label:'No disease',data:[6.1,7.2,7.8,7.1,8.1,8.4],backgroundColor:GREEN,borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,barPercentage:.7,plugins:{legend:{display:false}},scales:{x:{grid:{display:false},ticks:{maxRotation:30,font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%'},max:50}}}});
-new Chart(document.getElementById('aucChart'),{type:'bar',data:{labels:['Logistic Reg.','SVM (RBF)','Random Forest'],datasets:[{data:[0.849,0.828,0.855],backgroundColor:[GRAY,GRAY2,TEAL],borderRadius:6,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` AUC: ${c.raw}`}}},scales:{x:{min:0.78,max:0.88,grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+const RED='#e53935',GREEN='#22c55e',GRAY='#94a3b8',GRAY2='#64748b';
 
+new Chart(document.getElementById('ageChart'),{type:'line',data:{labels:['18-24','25-29','30-34','35-39','40-44','45-49','50-54','55-59','60-64','65-69','70-74','75-79','80+'],datasets:[{data:[0.6,1.2,1.5,2.1,3.2,4.8,7.1,10.3,14.2,18.5,23.1,27.4,31.6],borderColor:RED,backgroundColor:'rgba(229,57,53,0.07)',tension:.4,fill:true,pointRadius:5,pointBackgroundColor:RED,pointBorderColor:'white',pointBorderWidth:2,pointHoverRadius:7}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Disease rate: ${c.raw}%`}}},scales:{x:{grid:{display:false},ticks:{maxRotation:45,font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%',font:{size:10}},min:0,max:35}}}});
+
+new Chart(document.getElementById('ghChart'),{type:'bar',data:{labels:['Poor','Fair','Good','Very good','Excellent'],datasets:[{data:[32.1,18.4,8.7,4.2,2.1],backgroundColor:['#b71c1c','#e53935','#ef9a9a','#a5d6a7','#2e7d32'],borderRadius:6,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Disease rate: ${c.raw}%`}}},scales:{x:{grid:{display:false}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%'},max:38}}}});
+
+new Chart(document.getElementById('riskChart'),{type:'bar',data:{labels:['Stroke','Diff Walking','Diabetic','Kidney Dis.','Asthma','Smoking'],datasets:[{label:'Has disease',data:[38.2,22.1,18.6,20.4,12.3,11.8],backgroundColor:RED,borderRadius:3,borderSkipped:false},{label:'No disease',data:[6.1,7.2,7.8,7.1,8.1,8.4],backgroundColor:GREEN,borderRadius:3,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,barPercentage:.7,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${c.raw}%`}}},scales:{x:{grid:{display:false},ticks:{maxRotation:25,font:{size:10}}},y:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%'},max:46}}}});
+
+new Chart(document.getElementById('fiChart'),{type:'bar',data:{labels:['AgeCategory','GenHealth','DiffWalking','PhysHealth','Diabetic','BMI','MentalHealth','Stroke'],datasets:[{data:[28.7,13.4,10.0,8.6,8.2,5.4,4.8,4.1],backgroundColor:['#b71c1c','#e53935','#ef5350','#ef9a9a','#ffcdd2','#94a3b8','#b0bec5','#cfd8dc'],borderRadius:3,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`Importance: ${c.raw}%`}}},scales:{x:{grid:{color:'#f1f5f9'},ticks:{callback:v=>v+'%',font:{size:10}}},y:{grid:{display:false},ticks:{font:{size:11}}}}}});
+
+new Chart(document.getElementById('aucChart'),{type:'bar',data:{labels:['Logistic Reg.','SVM (RBF)','Random Forest'],datasets:[{data:[0.849,0.828,0.855],backgroundColor:[GREEN,GRAY,RED],borderRadius:5,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>`AUC: ${c.raw}`}}},scales:{x:{min:0.80,max:0.87,grid:{color:'#f1f5f9'},ticks:{font:{size:10}}},y:{grid:{display:false}}}}});
+
+// MODEL SWITCHER
+function switchModel(id){
+  document.querySelectorAll('.msw-btn').forEach((b,i)=>{b.classList.toggle('active',['lr','rf','svm'][i]===id)});
+  document.querySelectorAll('.model-detail').forEach(d=>d.classList.remove('show'));
+  document.getElementById('md-'+id).classList.add('show');
+}
+
+// RISK FACTORS
+const featData=[
+  {num:'31.6%',label:'DISEASE RATE IN 80+ AGE GROUP',title:'Age is the #1 predictor — by far',desc:'Think of it like this: a 25-year-old and an 85-year-old both fill out the same 17 questions. Even if everything else is identical, age alone shifts the risk enormously. In our 2,059 CDC patients, only 0.6% of 18–24 year-olds had heart disease. But 31.6% of people aged 80+ did. The model learned this pattern from real data — no manual rules, no medical textbook. Pure pattern recognition from 1,647 training patients.',vs:[{n:'31.6%',l:'Disease rate — age 80+',c:'hi'},{n:'0.6%',l:'Disease rate — age 18–24',c:'lo'}]},
+  {num:'32.1%',label:'DISEASE RATE IN "POOR HEALTH" PATIENTS',title:'How you feel predicts your heart health',desc:'The CDC asks one simple question: "In general, how would you say your health is?" That single answer turned out to be our 2nd strongest predictor. Why? Because how you feel already reflects everything — your fitness level, your chronic conditions, your energy. Patients who said "Poor" in our data had a 32.1% heart disease rate. Those who said "Excellent" had only 2.1%. That\'s a 15× difference from one question.',vs:[{n:'32.1%',l:'Poor health disease rate',c:'hi'},{n:'2.1%',l:'Excellent health disease rate',c:'lo'}]},
+  {num:'22.1%',label:'DISEASE RATE WITH WALKING DIFFICULTY',title:'Walking difficulty signals a struggling heart',desc:'If your heart is already weakened, it struggles to pump enough blood during physical activity. This shows up as difficulty climbing stairs or walking distances. In our data, patients with walking difficulty had a 22.1% heart disease rate, vs 7.2% for those who could walk normally. The model picked this up as a 10% importance feature because it\'s an indirect but reliable sign of cardiovascular compromise — measurable with one yes/no question.',vs:[{n:'22.1%',l:'Difficulty walking disease rate',c:'hi'},{n:'7.2%',l:'No difficulty disease rate',c:'lo'}]},
+  {num:'8.6%',label:'MODEL IMPORTANCE SCORE (4TH STRONGEST)',title:'More bad physical health days = higher risk',desc:'The CDC asks: "How many days in the past 30 was your physical health not good?" This captures chronic fatigue, chest discomfort, and reduced physical capacity — all downstream symptoms of heart disease. Patients with heart disease consistently report more of these days. It\'s not a direct test for heart disease, but it\'s a reliable lifestyle signal the model learned to weight heavily.',vs:[{n:'8.6%',l:'Feature importance score',c:'hi'},{n:'4th',l:'Ranking out of 17 features',c:'lo'}]},
+  {num:'18.6%',label:'DISEASE RATE IN DIABETIC PATIENTS',title:'Diabetes and heart disease share the same damage',desc:'High blood sugar doesn\'t just affect the pancreas. Over time, glucose damages the walls of blood vessels everywhere in the body — including the coronary arteries that feed the heart. It\'s the same damage mechanism. That\'s why 18.6% of diabetic patients in our data have heart disease, compared to 7.1% of non-diabetics. Diabetes is an independent cardiovascular risk factor, not just a blood sugar condition.',vs:[{n:'18.6%',l:'Diabetic disease rate',c:'hi'},{n:'7.1%',l:'Non-diabetic disease rate',c:'lo'}]},
+  {num:'38.2%',label:'DISEASE RATE AFTER HAVING A STROKE',title:'If you\'ve had a stroke, your arteries are already compromised',desc:'A stroke happens when an artery supplying the brain gets blocked or bursts — exactly the same process that causes heart attacks in the coronary arteries. Having had a stroke is a powerful signal that the patient\'s entire vascular system is under stress. In our CDC data, 38.2% of stroke survivors also have heart disease. That\'s the highest single binary predictor in our entire dataset — more than smoking, diabetes, or obesity.',vs:[{n:'38.2%',l:'Stroke survivors disease rate',c:'hi'},{n:'6.1%',l:'No stroke disease rate',c:'lo'}]},
+];
+
+function selectFeat(i){
+  document.querySelectorAll('.feat-row').forEach((r,j)=>r.classList.toggle('active',j===i));
+  const d=featData[i];
+  document.getElementById('fd-num').textContent=d.num;
+  document.getElementById('fd-label').textContent=d.label;
+  document.getElementById('fd-title').textContent=d.title;
+  document.getElementById('fd-desc').textContent=d.desc;
+  document.getElementById('fd-vs').innerHTML=d.vs.map(v=>`<div class="fdv ${v.c}"><span class="n">${v.n}</span><span class="l">${v.l}</span></div>`).join('');
+}
+
+// CALCULATOR
 const COEF=[0.009235,0.054442,-0.155185,0.215526,0.115099,0.116517,0.213399,0.244443,0.748440,0.270822,0.024275,-0.265184,-0.002267,0.009303,0.020719,0.150170,-0.024204,-0.111174,-0.038031,0.046559,0.098466];
 const INTERCEPT=-0.7319;
 const MEAN=[28.273,0.431,0.069,0.032,3.321,3.907,0.137,0.486,6.587,0.301,0.783,2.562,7.107,0.123,0.039,0.097,0.026,0.063,0.086,0.041,0.770];
 const STD=[6.259,0.495,0.253,0.176,7.899,7.896,0.344,0.500,3.474,0.694,0.412,1.022,1.491,0.328,0.195,0.296,0.158,0.243,0.280,0.199,0.421];
+const FLABELS=['BMI','Smoking','Alcohol','Stroke history','Physical health days','Mental health days','Difficulty walking','Sex (male)','Age group','Diabetes','Physical activity','General health','Sleep hours','Asthma','Kidney disease','Skin cancer','Race:Asian','Race:Black','Race:Hispanic','Race:Other','Race:White'];
 function sigmoid(x){return 1/(1+Math.exp(-x))}
+function getF(){return[parseFloat(document.getElementById('c-bmi').value),document.getElementById('c-sm').checked?1:0,document.getElementById('c-al').checked?1:0,document.getElementById('c-st').checked?1:0,parseFloat(document.getElementById('c-ph').value),parseFloat(document.getElementById('c-mh').value),document.getElementById('c-wk').checked?1:0,parseFloat(document.getElementById('c-sex').value),parseFloat(document.getElementById('c-age').value),parseFloat(document.getElementById('c-diab').value),document.getElementById('c-ac').checked?1:0,parseFloat(document.getElementById('c-gh').value),parseFloat(document.getElementById('c-sl').value),document.getElementById('c-as').checked?1:0,document.getElementById('c-kd').checked?1:0,document.getElementById('c-sc').checked?1:0,0,0,0,0,1]}
+function predict(f){const s=f.map((v,i)=>(v-MEAN[i])/STD[i]);return sigmoid(s.reduce((a,v,i)=>a+v*COEF[i],INTERCEPT))}
+
 function updateRisk(){
-  const age=parseFloat(document.getElementById('c-age').value);
-  const sex=parseFloat(document.getElementById('c-sex').value);
-  const bmi=parseFloat(document.getElementById('c-bmi').value);
-  const gh=parseFloat(document.getElementById('c-genhealth').value);
-  const diab=parseFloat(document.getElementById('c-diabetic').value);
-  const phys=parseFloat(document.getElementById('c-phys').value);
-  const mental=parseFloat(document.getElementById('c-mental').value);
-  const sleep=parseFloat(document.getElementById('c-sleep').value);
-  const smoke=document.getElementById('c-smoking').checked?1:0;
-  const alc=document.getElementById('c-alcohol').checked?1:0;
-  const stroke=document.getElementById('c-stroke').checked?1:0;
-  const walk=document.getElementById('c-walking').checked?1:0;
-  const act=document.getElementById('c-activity').checked?1:0;
-  const asthma=document.getElementById('c-asthma').checked?1:0;
-  const kidney=document.getElementById('c-kidney').checked?1:0;
-  const skin=document.getElementById('c-skin').checked?1:0;
-  const feats=[bmi,smoke,alc,stroke,phys,mental,walk,sex,age,diab,act,gh,sleep,asthma,kidney,skin,0,0,0,0,1];
-  const scaled=feats.map((v,i)=>(v-MEAN[i])/STD[i]);
-  const z=scaled.reduce((sum,v,i)=>sum+v*COEF[i],INTERCEPT);
-  const prob=sigmoid(z);
-  const pct=(prob*100).toFixed(1);
-  const circ=339.3;
-  const offset=circ*(1-prob);
-  const color=prob<0.15?'#22c55e':prob<0.30?'#f59e0b':'#ef4444';
-  const gaugeEl=document.getElementById('gauge-circle');
-  gaugeEl.style.strokeDashoffset=offset;
-  gaugeEl.style.stroke=color;
-  document.getElementById('risk-pct').textContent=pct+'%';
-  let label,msg;
-  if(prob<0.10){label='&#x1F7E2; Low Risk';msg='Your profile is associated with a lower risk based on CDC population data. Maintain your current healthy habits.'}
-  else if(prob<0.20){label='&#x1F7E1; Moderate Risk';msg='Some risk factors detected. Consider discussing these with your doctor, especially lifestyle factors you can improve.'}
-  else if(prob<0.35){label='&#x1F7E0; Elevated Risk';msg='Multiple risk factors detected. We recommend speaking with a healthcare professional about preventive measures and screening.'}
-  else{label='&#x1F534; High Risk';msg='Significant risk factors present. Please consult a qualified physician for cardiovascular screening and advice.'}
-  document.getElementById('risk-label').innerHTML=label;
-  document.getElementById('risk-label').style.color=color;
-  document.getElementById('risk-msg').textContent=msg;
+  const f=getF();const p=predict(f);const pct=(p*100).toFixed(1);
+  const color=p<0.12?'#22c55e':p<0.25?'#f59e0b':p<0.40?'#f97316':'#e53935';
+  document.getElementById('gauge-fg').style.strokeDashoffset=(389.6*(1-p)).toFixed(1);
+  document.getElementById('gauge-fg').style.stroke=color;
+  document.getElementById('gauge-pct').textContent=pct+'%';
+  let rl,rd;
+  if(p<0.10){rl='&#x1F7E2; Low risk';rd='Your answers look like people in our dataset who did NOT have heart disease. Keep your healthy habits going.'}
+  else if(p<0.20){rl='&#x1F7E1; Moderate risk';rd='Some risk factors present. Worth a conversation with your GP, especially about lifestyle changes.'}
+  else if(p<0.35){rl='&#x1F7E0; Elevated risk';rd='Multiple risk factors detected. A cardiovascular check-up with your doctor is a good idea.'}
+  else{rl='&#x1F534; High risk';rd='Several strong risk factors present. Please talk to a doctor about proper cardiovascular screening.'}
+  document.getElementById('risk-label').innerHTML=rl;document.getElementById('risk-label').style.color=color;
+  document.getElementById('risk-desc').textContent=rd;
+  // Factor breakdown
+  const contribs=f.map((_,i)=>({name:FLABELS[i],val:((f[i]-MEAN[i])/STD[i])*COEF[i],i})).filter(c=>Math.abs(c.val)>0.01).sort((a,b)=>Math.abs(b.val)-Math.abs(a.val)).slice(0,4);
+  const mx=Math.max(...contribs.map(c=>Math.abs(c.val)));
+  document.getElementById('factor-bd').innerHTML=contribs.map(c=>{
+    const pos=c.val>0;const w=Math.round(Math.abs(c.val)/mx*100);
+    return`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:11px;color:rgba(255,255,255,.4);min-width:110px;flex-shrink:0">${c.name}</span>
+      <div style="flex:1;height:4px;background:rgba(255,255,255,.07);border-radius:2px;overflow:hidden"><div style="width:${w}%;height:100%;background:${pos?'#e53935':'#22c55e'};border-radius:2px;transition:width .5s"></div></div>
+      <span style="font-size:11px;font-family:var(--mono);color:${pos?'#ef9a9a':'#86efac'}">${pos?'risk':'protect'}</span></div>`;
+  }).join('');
+  // What-if
+  const scenarios=[{label:'Start exercising',i:10,from:0,to:1},{label:'Quit smoking',i:1,from:1,to:0},{label:'Improve health to Good',i:11,from:null,to:Math.max(f[11],2)},{label:'Lose 5 BMI points',i:0,from:null,to:Math.max(15,f[0]-5)},{label:'Better sleep (7hrs)',i:12,from:null,to:7},{label:'No walking difficulty',i:6,from:1,to:0}];
+  const rows=scenarios.map(s=>{
+    if(s.from!==null&&f[s.i]!==s.from)return null;
+    if(f[s.i]===s.to)return null;
+    const mf=[...f];mf[s.i]=s.to;
+    const np=predict(mf);const diff=((np-p)*100).toFixed(1);
+    if(Math.abs(diff)<0.5)return null;
+    const better=parseFloat(diff)<0;const dc=better?'#4ade80':'#f87171';
+    return`<div class="wrow"><span class="wlbl">${s.label}</span><div class="wbar"><div class="wnow" style="width:${Math.min(100,(p*100).toFixed(0))}%"></div><div class="wnew" style="width:${Math.min(100,(np*100).toFixed(0))}%;background:${better?'rgba(74,222,128,.3)':'rgba(248,113,113,.3)'}"></div></div><span class="wdif" style="color:${dc}">${better?'':'+'}${diff}%</span></div>`;
+  }).filter(Boolean);
+  document.getElementById('whatif-rows').innerHTML=rows.length?rows.join(''):`<div style="font-size:12px;color:rgba(255,255,255,.25);text-align:center;padding:.5rem">No significant improvements found for your current profile.</div>`;
 }
 updateRisk();
 
-const observer=new IntersectionObserver((entries)=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
-document.querySelectorAll('.scard,.ccrd,.mcrd,.ecrd,.tcrd,.fitem,.callout').forEach(el=>{el.classList.add('fade-in');observer.observe(el)});
+const obs=new IntersectionObserver(e=>{e.forEach(x=>{if(x.isIntersecting)x.target.classList.add('in')})},{threshold:0.08});
+document.querySelectorAll('.fade').forEach(el=>obs.observe(el));
 </script>
 </body>
 </html>
